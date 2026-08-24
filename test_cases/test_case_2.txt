@@ -1,0 +1,12 @@
+FIRST INFORMATION REPORT (FIR) // DOSSIER #2026-MUM-4412
+
+Incident Date: 05 July 2026
+Incident Time: 14:30 HRS
+Location / Sector: Bandra Kurla Complex (BKC), Financial Zone, Mumbai, Maharashtra
+Coordinates: 19.0760, 72.8777
+
+INCIDENT NARRATIVE:
+On 05 July 2026, the complainant reported a sophisticated digital banking fraud operating out of the Bandra Kurla Complex area. The perpetrator posed as a senior bank compliance manager via an encrypted communication channel, tricking the victim into revealing sensitive authentication credentials and OTP tokens. Over three rapid unauthorized transfers executed between 14:30 HRS and 14:45 HRS, a sum of INR 12,50,000 was siphoned into multiple mule accounts registered across regional shell companies. No physical violence or weapons were reported at the scene.
+
+WEAPONS / THREAT SIGNALS DETECTED: None (Digital Asset Exploitation)
+STATUS: Active Cyber Investigation / Freeze Order Dispatched to Intermediary Banks

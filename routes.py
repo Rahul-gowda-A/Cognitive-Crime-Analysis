@@ -11,6 +11,13 @@ from app import app, db, User
 import subprocess
 import os
 import sys
+import io
+import re
+from PyPDF2 import PdfReader
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+# Initialize VADER Sentiment Intensity Analyzer
+vader_analyzer = SentimentIntensityAnalyzer()
 
 
 # ---------------------------------------------------------------------------
@@ -440,3 +447,336 @@ def crimefeed():
 @role_required('field_officer')
 def foliummap():
     return render_template("final.html")
+
+
+# ===========================================================================
+# Case File Intelligence Analyzer (field_officer only)
+# ===========================================================================
+
+def extract_case_intelligence(narrative_text: str, source_label: str = "Direct Narrative"):
+    """
+    NLP & Regex Intelligence Extraction Engine:
+    - VADER Sentiment analysis & threat index scoring
+    - Multi-vector Entity Extraction: Timelines, Weapons/Threats, Locations, IPC Crime Categories, Tactical cues
+    - Generates tactical threat classification and officer safety protocols.
+    """
+    if not narrative_text or not narrative_text.strip():
+        return None
+
+    clean_text = narrative_text.strip()
+    words = clean_text.split()
+    word_count = len(words)
+    char_count = len(clean_text)
+
+    # 1. VADER Sentiment Analysis
+    sentiment = vader_analyzer.polarity_scores(clean_text)
+    compound = sentiment['compound']
+    neg_score = sentiment['neg']
+    neu_score = sentiment['neu']
+    pos_score = sentiment['pos']
+
+    lower_text = clean_text.lower()
+
+    # 2. Weapons & Threat Indicators
+    weapon_catalog = {
+        'Firearms & Ballistics': [
+            r'\bpistol[s]?\b', r'\brevolver[s]?\b', r'\bgun[s]?\b', r'\bhandgun[s]?\b',
+            r'\bdeshi katta\b', r'\bkatta\b', r'\btamancha\b', r'\bcountry[- ]made (?:gun|firearm|pistol)\b',
+            r'\brifle[s]?\b', r'\bak-?47\b', r'\bcarbine\b', r'\bshotgun[s]?\b',
+            r'\bammunition\b', r'\bcartridge[s]?\b', r'\bbullet[s]?\b', r'\bmagazine[s]?\b',
+            r'\bfired (?:rounds|shots)\b', r'\bspent shell[s]?\b'
+        ],
+        'Edged & Sharp Weapons': [
+            r'\bknife\b', r'\bknives\b', r'\bdagger[s]?\b', r'\bmachete[s]?\b',
+            r'\btalwar[s]?\b', r'\bsword[s]?\b', r'\bblade[s]?\b', r'\bcleaver[s]?\b',
+            r'\brazor[s]?\b', r'\bchopper[s]?\b', r'\bswitchblade[s]?\b', r'\bkhukuri\b'
+        ],
+        'Blunt Force Weapons': [
+            r'\biron rod[s]?\b', r'\bsteel (?:rod|pipe)[s]?\b', r'\blathi[s]?\b',
+            r'\bwooden stick[s]?\b', r'\bcrowbar[s]?\b', r'\bbrass knuckles\b',
+            r'\bbaseball bat[s]?\b', r'\bheavy wrench\b', r'\bblunt object\b'
+        ],
+        'Explosives & Hazardous Agents': [
+            r'\bexplosive[s]?\b', r'\bied\b', r'\bbomb[s]?\b', r'\bgrenade[s]?\b',
+            r'\bdetonator[s]?\b', r'\bdynamite\b', r'\bpetrol bomb[s]?\b', r'\bmolotov\b',
+            r'\bacid\b', r'\bpoison\b', r'\bcyanide\b', r'\btoxic substance\b'
+        ],
+        'Tactical / Evasion Gear': [
+            r'\bface mask[s]?\b', r'\bbalaclava[s]?\b', r'\bglove[s]?\b',
+            r'\bfake (?:number plate|registration)\b', r'\bunmarked vehicle\b',
+            r'\bsignal jammer\b', r'\bwalkie[- ]talkie\b', r'\bstolen vehicle\b'
+        ]
+    }
+
+    extracted_weapons = []
+    weapon_risk_points = 0
+    for category, patterns in weapon_catalog.items():
+        found = set()
+        for pat in patterns:
+            matches = re.findall(pat, lower_text)
+            for m in matches:
+                found.add(m.strip().title())
+        if found:
+            risk_weight = 30 if ('Firearms' in category or 'Explosives' in category) else (20 if 'Edged' in category else 12)
+            weapon_risk_points += len(found) * risk_weight
+            extracted_weapons.append({
+                'category': category,
+                'elements': sorted(list(found)),
+                'items': sorted(list(found)),
+                'badge_class': 'danger' if ('Firearms' in category or 'Explosives' in category) else ('warning' if 'Edged' in category else 'info')
+            })
+
+    # 3. Dates & Timeline Extraction
+    date_matches = re.findall(r'\b(?:\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}[/-]\d{1,2}[/-]\d{1,2})\b', clean_text)
+    named_dates = re.findall(r'\b(?:\d{1,2}(?:st|nd|rd|th)?\s+)?(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}\b', clean_text, re.IGNORECASE)
+    named_dates_alt = re.findall(r'\b\d{1,2}(?:st|nd|rd|th)?\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?:,?\s+\d{4})?\b', clean_text, re.IGNORECASE)
+    time_matches = re.findall(r'\b\d{1,2}:\d{2}(?::\d{2})?\s*(?:AM|PM|am|pm|hrs|hours)?\b', clean_text)
+    mil_time = re.findall(r'\b\d{4}\s*(?:hrs|hours)\b', clean_text, re.IGNORECASE)
+    context_times = re.findall(r'\b(?:around\s+\d{1,2}\s*(?:am|pm|o\'clock)|midnight|noon|dawn|dusk|early morning|late night|yesterday evening|last night)\b', lower_text)
+
+    all_timeline = list(dict.fromkeys(date_matches + named_dates + named_dates_alt + time_matches + mil_time + [t.title() for t in context_times]))
+    timeline_signals = all_timeline[:12]
+
+    # 4. Locations & Geospatial Indicators
+    address_patterns = re.findall(
+        r'\b[A-Z][a-zA-Z0-9\s\.\'-]{2,25}\s+(?:Nagar|Layout|Colony|Enclave|Sector\s*\d+|Chowk|Cross|Main|Marg|Circle|Junction|Highway|Expressway|Station|Road|Street|Lane|Avenue|Flyover|Bypass|Ghat|Market|Bazaar|Puram|Ganj|Hall|Complex|Mall|Apartments|Police Station|Post|Village|Taluk|District)\b',
+        clean_text
+    )
+    preposition_locs = re.findall(
+        r'\b(?:near|at|around|opposite|behind|adjacent to|in front of|off)\s+([A-Z][a-zA-Z0-9\s]{2,25}(?:[,\.\s]|$))',
+        clean_text
+    )
+    indian_hotspots = [
+        'Bengaluru', 'Bangalore', 'Mumbai', 'Delhi', 'New Delhi', 'Kolkata', 'Chennai', 'Hyderabad',
+        'Pune', 'Ahmedabad', 'Mysuru', 'Mysore', 'Hubballi', 'Belagavi', 'Mangaluru', 'Thane',
+        'Noida', 'Gurugram', 'Gurgaon', 'Jaipur', 'Lucknow', 'Patna', 'Bhopal', 'Indore', 'Surat',
+        'Kanpur', 'Nagpur', 'Visakhapatnam', 'Varanasi', 'Kochi', 'Coimbatore', 'Chandigarh', 'Goa'
+    ]
+    city_matches = [city for city in indian_hotspots if re.search(r'\b' + re.escape(city) + r'\b', clean_text, re.IGNORECASE)]
+
+    combined_locs = []
+    for loc in address_patterns + preposition_locs + city_matches:
+        cleaned_loc = re.sub(r'[\.,\n\r]+', '', loc).strip()
+        if len(cleaned_loc) >= 3 and cleaned_loc not in combined_locs:
+            combined_locs.append(cleaned_loc)
+    location_list = combined_locs[:10]
+
+    # 5. IPC Crime Categories & Statutory Classification
+    ipc_matrix = [
+        {
+            'category': 'Violent Crime & Bodily Offences',
+            'ipc_sections': 'IPC 302, 307, 323, 326, 363, 364A, 376',
+            'severity': 'Critical High',
+            'weight': 35,
+            'keywords': [
+                r'\bmurder\b', r'\battempt to murder\b', r'\bhomicide\b', r'\bkilled\b', r'\bstabbed\b',
+                r'\bshot\b', r'\bgrievous hurt\b', r'\bassaulted\b', r'\bkidnapp(?:ing|ed)\b',
+                r'\babduct(?:ion|ed)\b', r'\brape\b', r'\bsexual assault\b', r'\bcriminal intimidation\b',
+                r'\bhurt\b', r'\bstrangled\b', r'\bfatal\b', r'\bbleeding\b', r'\binjured\b'
+            ]
+        },
+        {
+            'category': 'Property & Organized Crime',
+            'ipc_sections': 'IPC 378, 379, 384, 392, 395, 448, 457',
+            'severity': 'Elevated Risk',
+            'weight': 22,
+            'keywords': [
+                r'\brobbery\b', r'\bdacoity\b', r'\btheft\b', r'\bstolen\b', r'\bextortion\b',
+                r'\bburglary\b', r'\bbreak[- ]in\b', r'\bhouse[- ]breaking\b', r'\blooted\b',
+                r'\bsnatched\b', r'\btrespass\b', r'\barson\b', r'\bmischief by fire\b', r'\bransom\b'
+            ]
+        },
+        {
+            'category': 'Financial & Cyber Offense',
+            'ipc_sections': 'IPC 406, 420, 468, IT Act 66C/66D',
+            'severity': 'Moderate Risk',
+            'weight': 15,
+            'keywords': [
+                r'\bfraud\b', r'\bcheating\b', r'\bforgery\b', r'\bembezzlement\b',
+                r'\bmoney laundering\b', r'\bcyber\b', r'\bphishing\b', r'\bransomware\b',
+                r'\bhacked\b', r'\bidentity theft\b', r'\bunauthorized access\b', r'\bfake bank\b',
+                r'\botp fraud\b', r'\bcrypto fraud\b', r'\bforged document\b'
+            ]
+        },
+        {
+            'category': 'Contraband, Narcotics & Arms',
+            'ipc_sections': 'NDPS Act 1985, Arms Act Sec 25/27',
+            'severity': 'Critical High',
+            'weight': 30,
+            'keywords': [
+                r'\bndps\b', r'\bnarcotics\b', r'\bdrugs\b', r'\bganja\b', r'\bheroin\b',
+                r'\bcocaine\b', r'\bsmack\b', r'\bmethamphetamine\b', r'\bcontraband\b',
+                r'\billegal arms\b', r'\bunlicensed (?:weapon|pistol|firearm)\b', r'\bsmuggling\b',
+                r'\bpeddler\b', r'\bdrug syndicate\b', r'\bconsignment\b'
+            ]
+        },
+        {
+            'category': 'Public Order, Rioting & Unlawful Assembly',
+            'ipc_sections': 'IPC 144, 147, 148, 149, 153A',
+            'severity': 'Elevated Risk',
+            'weight': 20,
+            'keywords': [
+                r'\brioting\b', r'\bunlawful assembly\b', r'\bmob violence\b', r'\bstone pelting\b',
+                r'\bcommunal\b', r'\bvandalism\b', r'\bcurfew\b', r'\bpublic tranquility\b',
+                r'\bagitator[s]?\b', r'\bsection 144\b'
+            ]
+        }
+    ]
+
+    detected_ipc = []
+    ipc_risk_points = 0
+    for entry in ipc_matrix:
+        matched_terms = set()
+        for kw in entry['keywords']:
+            m = re.findall(kw, lower_text)
+            if m:
+                matched_terms.update([x.strip().title() for x in m])
+        if matched_terms:
+            ipc_risk_points += entry['weight'] + (len(matched_terms) * 4)
+            detected_ipc.append({
+                'category': entry['category'],
+                'ipc_sections': entry['ipc_sections'],
+                'severity': entry['severity'],
+                'matches': sorted(list(matched_terms)),
+                'badge_class': 'danger' if 'Critical' in entry['severity'] else ('warning' if 'Elevated' in entry['severity'] else 'info')
+            })
+
+    # 6. Tactical Signals: Vehicles, Phones, Aliases
+    tactical_signals = {
+        'vehicles': list(dict.fromkeys(re.findall(r'\b[A-Z]{2}[-\s]?\d{1,2}[-\s]?[A-Z]{1,3}[-\s]?\d{4}\b', clean_text)))[:5],
+        'phone_numbers': list(dict.fromkeys(re.findall(r'\b(?:\+?91[\-\s]?)?[6-9]\d{9}\b', clean_text)))[:5],
+        'suspect_aliases': list(dict.fromkeys(re.findall(r'\b(?:alias|a\.k\.a\.?|known as)\s+([A-Z][a-zA-Z0-9_\'-]+)', clean_text, re.IGNORECASE)))[:5]
+    }
+
+    # 7. Holistic Threat Severity Rating Calculation
+    neg_factor = neg_score * 85.0
+    sentiment_penalty = 20.0 if compound <= -0.4 else (10.0 if compound <= -0.1 else 0.0)
+    raw_threat_index = neg_factor + sentiment_penalty + min(weapon_risk_points, 35) + min(ipc_risk_points, 35)
+    threat_score = min(100, max(5, int(raw_threat_index)))
+
+    has_critical_weapons = any(('Firearms' in w['category'] or 'Explosives' in w['category'] or 'Edged' in w['category']) for w in extracted_weapons)
+    has_violent_crime = any(('Violent' in c['category'] or 'Contraband' in c['category']) for c in detected_ipc)
+
+    if threat_score >= 60 or compound <= -0.45 or (has_critical_weapons and has_violent_crime):
+        severity_label = "HIGH RISK"
+        severity_class = "danger"
+        severity_desc = "Immediate tactical threat detected. Multiple lethal risk vectors, violent offense markers, or heightened negative polarity."
+        action_protocol = [
+            "Mandate 2+ Armed Tactical Field Officers on approach.",
+            "Dispatch Forensic Crime Scene Unit for ballistic / biological evidence retrieval.",
+            "Secure surrounding CCTV telemetry and establish territorial cordon.",
+            "Issue emergency lookout circular for identified suspect markers."
+        ]
+    elif threat_score >= 30 or compound <= -0.05 or extracted_weapons or detected_ipc:
+        severity_label = "MODERATE THREAT"
+        severity_class = "warning"
+        severity_desc = "Elevated risk incident. Property, cyber, or physical confrontation markers detected with moderate threat indicators."
+        action_protocol = [
+            "Deploy standard Field Patrol Unit with body-worn cameras.",
+            "Verify witness testimonies and cross-examine geolocation telemetry.",
+            "Preserve chain of custody for digital/physical evidence.",
+            "Log suspect vehicle / contact identifiers into regional surveillance registry."
+        ]
+    else:
+        severity_label = "LOW THREAT"
+        severity_class = "safe"
+        severity_desc = "Informational or low-threat occurrence. No active lethal weapons or critical violence indicators identified."
+        action_protocol = [
+            "Log incident statement into standard non-cognizable / general diary records.",
+            "Conduct routine community follow-up if applicable.",
+            "Archive telemetry for retrospective analytical pattern modeling."
+        ]
+
+    excerpt = clean_text[:600] + ('...' if len(clean_text) > 600 else '')
+
+    return {
+        'source_label': source_label,
+        'word_count': word_count,
+        'char_count': char_count,
+        'sentiment': {
+            'compound': round(compound, 4),
+            'neg': round(neg_score, 3),
+            'neu': round(neu_score, 3),
+            'pos': round(pos_score, 3),
+        },
+        'threat_score': threat_score,
+        'severity_label': severity_label,
+        'severity_class': severity_class,
+        'severity_desc': severity_desc,
+        'action_protocol': action_protocol,
+        'weapons': extracted_weapons,
+        'locations': location_list,
+        'timeline': timeline_signals,
+        'ipc_categories': detected_ipc,
+        'tactical_signals': tactical_signals,
+        'raw_excerpt': excerpt
+    }
+
+
+@app.route('/analyze_case', methods=['GET', 'POST'])
+@login_required
+@role_required('field_officer')
+def analyze_case():
+    """
+    Case File Intelligence Analyzer for Field Officers.
+    Accepts direct text input or file uploads (.pdf, .txt).
+    Extracts plain text via PyPDF2 / text decoders, applies VADER Sentiment & Regex NLP
+    to compute Threat Severity, Key Entities, and IPC Crime Categories.
+    """
+    if request.method == 'GET':
+        return render_template('case_analysis.html', result=None, raw_text="")
+
+    extracted_text = ""
+    source_label = "Direct Text Narrative"
+
+    # 1. Check for file upload
+    if 'case_file' in request.files:
+        file = request.files['case_file']
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            ext = os.path.splitext(filename)[1].lower()
+
+            if ext == '.pdf':
+                try:
+                    pdf_bytes = file.read()
+                    pdf_reader = PdfReader(io.BytesIO(pdf_bytes))
+                    extracted_pages = []
+                    for page_idx, page in enumerate(pdf_reader.pages):
+                        page_text = page.extract_text()
+                        if page_text:
+                            extracted_pages.append(page_text)
+                    extracted_text = "\n".join(extracted_pages).strip()
+                    source_label = f"Uploaded PDF ({filename}) - {len(pdf_reader.pages)} Page(s)"
+                except Exception as e:
+                    flash(f"Error reading PDF file '{filename}': {str(e)}", "danger")
+                    return render_template('case_analysis.html', result=None, raw_text="")
+            elif ext == '.txt':
+                try:
+                    raw_bytes = file.read()
+                    extracted_text = raw_bytes.decode('utf-8', errors='ignore').strip()
+                    source_label = f"Uploaded Text File ({filename})"
+                except Exception as e:
+                    flash(f"Error reading Text file '{filename}': {str(e)}", "danger")
+                    return render_template('case_analysis.html', result=None, raw_text="")
+            else:
+                flash("Unsupported file format. Please upload a .pdf or .txt file.", "danger")
+                return render_template('case_analysis.html', result=None, raw_text="")
+
+    # 2. Fallback to direct text narrative form field if no file uploaded
+    if not extracted_text:
+        form_text = request.form.get('case_text', '').strip()
+        if form_text:
+            extracted_text = form_text
+            source_label = "Direct FIR / Narrative Input"
+
+    if not extracted_text:
+        flash("Please provide a case narrative or upload a valid .pdf / .txt document to analyze.", "warning")
+        return render_template('case_analysis.html', result=None, raw_text="")
+
+    # 3. Perform NLP & Regex Intelligence Extraction
+    try:
+        intel_result = extract_case_intelligence(extracted_text, source_label=source_label)
+        return render_template('case_analysis.html', result=intel_result, raw_text=extracted_text)
+    except Exception as e:
+        flash(f"Intelligence processing failed: {str(e)}", "danger")
+        return render_template('case_analysis.html', result=None, raw_text=extracted_text)

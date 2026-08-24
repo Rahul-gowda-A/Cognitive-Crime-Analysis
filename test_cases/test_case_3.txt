@@ -1,0 +1,12 @@
+FIRST INFORMATION REPORT (FIR) // DOSSIER #2026-DEL-1093
+
+Incident Date: 20 August 2026
+Incident Time: 03:00 HRS
+Location / Sector: Connaught Place, Block C Market, New Delhi, Delhi
+Coordinates: 28.6139, 77.2090
+
+INCIDENT NARRATIVE:
+On 20 August 2026 at approximately 03:00 HRS during non-operational hours, a commercial break-in occurred at a retail store in Block C, Connaught Place. Onsite surveillance telemetry shows two individuals using a heavy crowbar and iron rod to break open the rear security shutters. The suspects compromised the internal safe, stealing high-value electronic inventory, wristwatches, and reserve cash amounting to INR 3,20,000. Patrol officers discovered the breached door during routine early-morning rounds at 04:30 HRS. No casualties or firearms were involved.
+
+WEAPONS / THREAT SIGNALS DETECTED: Iron Rod, Crowbar, Force Tools
+STATUS: Moderate Priority / Forensics Unit Dispatched for Latent Fingerprint Scan

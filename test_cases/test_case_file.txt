@@ -1,0 +1,18 @@
+CASE REPORT: CR-2026-0894
+INCIDENT: Commercial Burglary & Cyber Breach
+DATE/TIME: August 24, 2026 - 02:15 AM
+LOCATION: Apex Tech Solutions, Bldg 4, Floor 3
+
+EXECUTIVE SUMMARY:
+At approximately 02:15 AM, unauthorized entry was detected at the Apex Tech Solutions facility. Physical security logs indicate an override of the Server Room access control panel using cloned credentials belonging to System Administrator Mark Vance. 
+
+SUSPECT DESCRIPTION & EVIDENCE:
+- Suspect: Male, approx. 6'0", athletic build, masked, wearing dark tactical gear.
+- Digital Artifacts: An external USB drive containing an encrypted payload was inserted into Server Node 04 at 02:22 AM. Data exfiltration detected to IP 192.0.2.144.
+- Physical Evidence: Forced entry via service elevator shaft; glass shattered on secondary exit door. Left-hand glove print recovered from control panel.
+
+WITNESS STATEMENTS:
+- Night Guard J. Miller reported erratic power fluctuations across the 3rd floor at 02:10 AM prior to the perimeter alarm triggering.
+
+RECOMMENDED ACTION:
+ cross-reference IP logs with known syndicate subnets, run forensic analysis on thumb drive payload, and pull external street surveillance between 01:45 AM and 02:30 AM.
