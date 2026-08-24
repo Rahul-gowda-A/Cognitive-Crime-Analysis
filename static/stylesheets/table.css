@@ -1,67 +1,66 @@
+/* ==========================================================================
+   CRIME INTELLIGENCE - DATA TABLES & WRAPPERS (THEME 4: GLASSMORPHIC)
+   ========================================================================== */
+
+.table-wrapper {
+    height: 700px;
+    overflow-x: auto;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    margin: 24px 0;
+}
+
 table {
-    border-collapse: collapse;
+    border-collapse: separate !important;
+    border-spacing: 0;
     width: 100%;
-    border-radius: 25px;
-    border-color: none;
-}
-
-.state-row {
-    background-color: #222222;
-    color: #ffffff;
-}
-
-th,
-td {
-    border: #222222;
-    padding: 8px;
-    white-space: nowrap;
-    font-family: monsterrat;
-    text-align: center;
+    background: transparent !important;
 }
 
 th {
-    background-color: #222222;
-    color: #ffffff;
+    position: sticky;
+    top: 0;
+    background: rgba(15, 23, 42, 0.96) !important;
+    color: #c084fc !important;
+    font-family: var(--font-heading) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    padding: 16px 20px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    z-index: 10;
+    backdrop-filter: blur(16px);
 }
 
-.toggle-button button {
-    margin-right: 30px;
+td {
+    padding: 14px 20px !important;
+    font-family: var(--font-mono) !important;
+    font-size: 12.5px !important;
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+
+tr:hover td {
+    background: rgba(139, 92, 246, 0.1) !important;
+    color: #ffffff !important;
 }
 
 .toggle-button {
-    margin-left: 300px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 30px auto;
 }
 
-.table-wrapper {
-    height: 800px;
-    overflow-x: scroll;
-    overflow-y: scroll;
-    border: #222222;
-    border-style: solid;
-    border-color: #222222;
-    margin-bottom: 20px;
-    border-radius: 25px;
-    box-shadow: 0px 0px 30px rgba(0.6, 0.8, 0.5, 0.5);
-    transform: perspective(500px);
-    border-radius: 10px;
-    border-collapse: collapse;
-    margin-left: 100px;
-}
-
-.table-wrapper::-webkit-scrollbar {
-    width: 15px;
-    border-radius: 25px;
-    overflow: auto;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb {
-    border-radius: 25px;
-    background-color: #b3b3b3;
-    height: 20px;
-    width: 18px;
-}
-
-tr:nth-child(even) {
-    background-color: #bbbb;
-    color: #222222;
+.toggle-button button {
+    margin: 0 !important;
 }

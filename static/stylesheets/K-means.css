@@ -1,66 +1,125 @@
-label.pagename {
-    color: #222222;
-    font-size: 35px;
-    font-family: monsterrat;
-    padding: 0;
-}
+/* ==========================================================================
+   CRIME INTELLIGENCE - CLUSTERING & PREDICTION CONSOLE (THEME 4: GLASSMORPHIC)
+   ========================================================================== */
 
 .subnav {
-    background-color: #bbbbbb;
-    height: 40px;
+    background: rgba(15, 23, 42, 0.7) !important;
+    height: 48px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(16px);
 }
 
-.border {
-    overflow: auto;
+/* Threat Matrix Legend */
+.threat-matrix-legend {
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 20px 24px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-label {
-    margin-left: 40px;
+.legend-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-select {
-    margin-left: 10px;
-}
-
-nav.prediction {
-    background-color: #bbbbbb;
-    height: 40px;
-}
-
-option.sel {
-    color: #222222;
-    background: #bbbb;
-}
-
-.box {
-    border-color: none;
-}
-
-input {
-    padding: 2px;
-    border: 1px solid #222222;
-    height: 30px;
-    width: 100px;
-    background-color: #ffffff;
-    color: #222222;
-    font-family: "mosterrat";
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 2px 5px;
-    border-radius: 6px;
-}
-
-.form-input {
-    padding: 30px 0px;
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
     display: inline-block;
-    text-align: center;
+}
+
+.legend-dot.red {
+    background-color: var(--accent-coral);
+    box-shadow: 0 0 12px var(--accent-coral);
+}
+
+.legend-dot.orange {
+    background-color: var(--accent-amber);
+    box-shadow: 0 0 12px var(--accent-amber);
+}
+
+.legend-dot.green {
+    background-color: var(--accent-emerald);
+    box-shadow: 0 0 12px var(--accent-emerald);
+}
+
+/* Query Form */
+.predictions {
+    max-width: 900px;
+    margin: 35px auto;
+    padding: 0 20px;
+}
+
+.predictions form {
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    padding: 35px 32px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.08) !important;
+    position: relative;
 }
 
 .for-select {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px;
 }
 
-.input-container select {
-    flex: 1 0 auto;
-    margin: 10px;
+.for-select label {
+    font-family: var(--font-heading) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--text-secondary) !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Prediction Result Panel */
+.prediction-result-panel {
+    margin: 30px 0;
+    padding: 28px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(139, 92, 246, 0.2);
+}
+
+.cluster-text {
+    font-family: var(--font-heading) !important;
+    font-size: 36px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    margin: 15px 0 !important;
+    display: block;
+}
+
+.cluster-text.red-zone {
+    color: var(--accent-coral) !important;
+    text-shadow: 0 0 25px rgba(244, 63, 94, 0.6) !important;
+}
+
+.cluster-text.orange-zone {
+    color: var(--accent-amber) !important;
+    text-shadow: 0 0 25px rgba(245, 158, 11, 0.6) !important;
+}
+
+.cluster-text.green-zone {
+    color: var(--accent-emerald) !important;
+    text-shadow: 0 0 25px rgba(16, 185, 129, 0.6) !important;
 }

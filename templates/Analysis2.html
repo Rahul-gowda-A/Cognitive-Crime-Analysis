@@ -6,17 +6,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis2(2014-2021)</title>
+    <title>Comparative Visual Analytics (2014-2021) // Interactive Plotly Engine</title>
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/K-means.css')}}">
+    <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
 
 </head>
 <style>
 
 </style>
 <script type="text/javascript">
-    var states_arr = new Array("Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Orissa", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "D & N Haveli and Daman & Diu", "Delhi", "Lakshadweep", "Pondicherry");
+    var states_arr = new Array("Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Orissa", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "D & N Haveli and Daman & Diu", "Delhi", "Lakshadweep", "Pondicherry");
 
     function populateStates(stateElementId) {
         var stateElement = document.getElementById(stateElementId);
@@ -83,8 +84,8 @@
             document.getElementById('iframeID3').src = 'plots/Multi_linear/Tripura_linear.html';
         else if (val == "Uttar Pradesh")
             document.getElementById('iframeID3').src = 'plots/Multi_linear/Uttar Pradesh_linear.html';
-        else if (val == "Uttaranchal")
-            document.getElementById('iframeID3').src = 'plots/Multi_linear/Uttaranchal_linear.html';
+        else if (val == "Uttarakhand" || val == "Uttaranchal")
+            document.getElementById('iframeID3').src = 'plots/Multi_linear/Uttarakhand_linear.html';
         else if (val == "West Bengal")
             document.getElementById('iframeID3').src = 'plots/Multi_linear/West Bengal_linear.html';
         else if (val == "Andaman and Nicobar Islands")
@@ -163,8 +164,8 @@
             document.getElementById('iframeID3').src = 'plots/Stacked_Bar_Charts/Tripura_stbar.html';
         else if (val == "Uttar Pradesh")
             document.getElementById('iframeID3').src = 'plots/Stacked_Bar_Charts/Uttar Pradesh_stbar.html';
-        else if (val == "Uttaranchal")
-            document.getElementById('iframeID3').src = 'plots/Stacked_Bar_Charts/Uttaranchal_stbar.html';
+        else if (val == "Uttarakhand" || val == "Uttaranchal")
+            document.getElementById('iframeID3').src = 'plots/Stacked_Bar_Charts/Uttarakhand_stbar.html';
         else if (val == "West Bengal")
             document.getElementById('iframeID3').src = 'plots/Stacked_Bar_Charts/West Bengal_stbar.html';
         else if (val == "Andaman and Nicobar Islands")
@@ -240,8 +241,8 @@
             document.getElementById('iframeID3').src = 'plots/Grouped_Bar_Charts/Tripura_grbar.html';
         else if (val == "Uttar Pradesh")
             document.getElementById('iframeID3').src = 'plots/Grouped_Bar_Charts/Uttar Pradesh_grbar.html';
-        else if (val == "Uttaranchal")
-            document.getElementById('iframeID3').src = 'plots/Grouped_Bar_Charts/Uttaranchal_grbar.html';
+        else if (val == "Uttarakhand" || val == "Uttaranchal")
+            document.getElementById('iframeID3').src = 'plots/Grouped_Bar_Charts/Uttarakhand_grbar.html';
         else if (val == "West Bengal")
             document.getElementById('iframeID3').src = 'plots/Grouped_Bar_Charts/West Bengal_grbar.html';
         else if (val == "Andaman and Nicobar Islands")
@@ -270,49 +271,67 @@
 </style>
 
 <body>
+    <!-- Main Navigation Bar -->
     <nav class="main">
-        <a href="{{url_for('index')}}"><label style="margin-left:0;"class="logo">CRIME ANALYSIS</label></a>
+        <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-            <li><a href="{{url_for('index')}}">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Feedback</a></li>
+            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
+            <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
+            <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
-
-        <nav class="secondnav">
-            <label class="log" href="#"> GRAPHS</label>
-        </nav>
     </nav>
-    <div style="margin-left:200px; margin-top:130px;" for="state_input">
-        <label>State:</label>
-        <select id="state_input" name="state_input">
-        <option value="disabled selected">Select State</option>
 
-    </select>
+    <!-- Sub Navigation -->
+    <nav class="secondnav">
+        <label class="log"><i class="fas fa-chart-simple mr-2"></i> MULTI-VARIABLE COMPARATIVE VISUALIZATIONS (2014-2021)</label>
+    </nav>
 
-
-
-    </div>
-    <script language="javascript">
-        populateStates("state_input");
-    </script>
-    <div style="margin-top:50px; position: absolute;">
-        <div style="margin-left: 20px; margin-top: 50px; " role="tab"><button class="button" onclick="changeLinear('state_input')">Multi-Linear Chart</button></div>
-        <div style="margin-left: 20px; margin-top: 40px;"><button class="button" onclick="changeSBar('state_input')">Stacked Bar Chart</button></div>
-        <div style="margin-left: 20px; margin-top: 40px;"><button class="button" onclick="changeGBar('state_input')">Grouped Bar Chart</button></div>
-
-    </div>
-    <div class="box" style="margin-left:220px; overflow: hidden;">
-        <div class="tab-pane fade show active" id="v-pills-area-chart" role="tabpanel" aria-labelledby="v-pills-area-chart-tab">
-
-            <iframe src="plots/Multi_linear/Assam_linear.html" frameborder="0" width="1200" height="600" id="iframeID3"></iframe>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- Controls Strip -->
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-xl mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="for-select m-0 w-full md:w-auto">
+                <label for="state_input"><i class="fas fa-map-marker-alt mr-1"></i> Target State / UT:</label>
+                <select id="state_input" name="state_input">
+                    <option disabled selected>Select State</option>
+                </select>
+            </div>
+            
+            <div class="flex flex-wrap gap-3 w-full md:w-auto justify-end">
+                <button class="button" onclick="changeLinear('state_input')"><i class="fas fa-chart-line mr-1"></i> Multi-Linear</button>
+                <button class="button" onclick="changeSBar('state_input')"><i class="fas fa-chart-column mr-1"></i> Stacked Bar</button>
+                <button class="button" onclick="changeGBar('state_input')"><i class="fas fa-chart-bar mr-1"></i> Grouped Bar</button>
+            </div>
         </div>
+
+        <script language="javascript">
+            populateStates("state_input");
+        </script>
+
+        <!-- Visualization Frame -->
+        <div class="box">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <span style="font-family: var(--font-cyber); font-size: 14px; letter-spacing: 2px; color: #ffffff;">
+                    <i class="fas fa-chart-pie text-cyan-400 mr-2"></i> INTERACTIVE PLOTLY COMPARISON MATRIX
+                </span>
+                <span class="text-xs text-cyan-400 font-mono">PLOTLY ENGINE</span>
+            </div>
+            <div style="padding: 10px; height: 600px;">
+                <iframe src="plots/Multi_linear/Assam_linear.html" frameborder="0" style="width: 100%; height: 100%; border: none; border-radius: 8px;" id="iframeID3"></iframe>
+            </div>
+        </div>
+
     </div>
 
+    <!-- Footer -->
     <footer>
-        <p> Copyright &copy; 2023. All rights reserved.</p>
-
+        <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
     </footer>
+
+    <!-- Suspense FX Script -->
+    <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
 </body>
 
 

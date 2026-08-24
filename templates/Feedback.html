@@ -1,36 +1,59 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedBack</title>
+    <title>Intelligence Feedback // Case Debriefing</title>
+
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/K-means.css')}}">
 
+    <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
+    <!-- Main Navigation Bar -->
     <nav class="main">
-        <label class="logo" href="{{url_for('index')}}">CRIME ANALYSIS</label>
+        <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-            <li>
-                <a href="{{url_for('index')}}">Home</a>
-            </li>
-            <li><a href="{{url_for('about')}}">About</a></li>
-            <li><a href="https://github.com/Mubeen-Zaki/Final_Year_Project">Contact</a></li>
-            <li><a href="{{url_for('feedback')}}">Feedback</a></li>
+            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
+            <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
+            <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
     </nav>
-    <div style="text-align: center; font-family: monsterrat; margin-top: 100px;"></div>
-    <div class="box" style="overflow: hidden; margin-left: 15%; width:1000px;">
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfGOGp2Q9oELy_IZ0P79xcA_rpxMaDazM63chlCh_gMl_NCIg/viewform" width="100%" height="700" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+
+    <!-- Sub Navigation -->
+    <nav class="secondnav">
+        <label class="log"><i class="fas fa-comment-dots mr-2"></i> INTELLIGENCE DEBRIEFING & INCIDENT FEEDBACK</label>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="box p-6">
+            <div class="mb-4 pb-2 border-b border-gray-800 flex justify-between items-center">
+                <span style="font-family: var(--font-cyber); font-size: 14px; color: var(--accent-cyan); letter-spacing: 2px;">
+                    <i class="fas fa-user-shield mr-2"></i> SUBMIT FIELD OBSERVATIONS & SYSTEM FEEDBACK
+                </span>
+                <span class="text-xs font-mono text-gray-400">ENCRYPTED CHANNEL</span>
+            </div>
+            <div style="height: 700px; overflow: hidden; border-radius: 8px;">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfGOGp2Q9oELy_IZ0P79xcA_rpxMaDazM63chlCh_gMl_NCIg/viewform" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">Loading encrypted form...</iframe>
+            </div>
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
+    </footer>
+
+    <!-- Suspense FX Script -->
+    <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
 </body>
 
 </html>

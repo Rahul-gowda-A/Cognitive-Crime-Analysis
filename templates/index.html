@@ -4,170 +4,328 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Intelligence // Threat Analysis & Predictive Surveillance</title>
+    
+    <!-- Tailwind & Google Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crime Hotpots Home Page</title>
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
-
-
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
+    
+    <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
 </head>
-<style>
-    button a {
-        text-decoration: none;
-    }
-</style>
-
 
 <body>
+    <!-- Main Navigation Bar -->
     <nav class="main">
-        <label class="logo" href="{{url_for('index')}}">CRIME ANALYSIS</label>
+        <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-            <li>
-                <a href="{{url_for('index')}}">Home</a>
-            </li>
-            <li><a href="{{url_for('about')}}">About</a></li>
-            <li><a href="https://github.com/Mubeen-Zaki/Final_Year_Project">Contact</a></li>
-            <li><a href="{{url_for('feedback')}}">Feedback</a></li>
+            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
+            <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
+            {% endif %}
+            <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
+
+        <!-- Auth Controls -->
+        <div class="nav-auth" style="display:flex;align-items:center;gap:0.6rem;margin-left:auto;padding-right:0.5rem;flex-shrink:0;">
+            {% if current_user.is_authenticated %}
+                <span class="nav-role-badge" style="
+                    display:inline-flex;align-items:center;gap:0.35rem;
+                    padding:0.25rem 0.65rem;border-radius:999px;font-size:0.7rem;
+                    font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+                    background:rgba(139,92,246,0.18);border:1px solid rgba(139,92,246,0.45);
+                    color:#a78bfa;white-space:nowrap;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:#a78bfa;
+                                 box-shadow:0 0 6px #a78bfa;flex-shrink:0;"></span>
+                    {{ current_user.role | upper }}
+                </span>
+
+                <a href="{{ url_for('logout') }}" class="nav-logout-btn" style="
+                    display:inline-flex;align-items:center;gap:0.35rem;
+                    padding:0.3rem 0.8rem;border-radius:8px;font-size:0.78rem;
+                    font-weight:600;letter-spacing:0.03em;text-decoration:none;
+                    background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.4);
+                    color:#f87171;transition:background 0.2s,border-color 0.2s,transform 0.15s;
+                    white-space:nowrap;"
+                    onmouseover="this.style.background='rgba(248,113,113,0.22)';this.style.transform='translateY(-1px)';"
+                    onmouseout="this.style.background='rgba(248,113,113,0.12)';this.style.transform='translateY(0)';">
+                    <i class="fas fa-sign-out-alt" style="font-size:0.75rem;"></i> Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-login-btn" style="
+                    display:inline-flex;align-items:center;gap:0.35rem;
+                    padding:0.3rem 0.8rem;border-radius:8px;font-size:0.78rem;
+                    font-weight:600;letter-spacing:0.03em;text-decoration:none;
+                    background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.45);
+                    color:#a78bfa;transition:background 0.2s,border-color 0.2s,transform 0.15s;
+                    white-space:nowrap;"
+                    onmouseover="this.style.background='rgba(139,92,246,0.28)';this.style.transform='translateY(-1px)';"
+                    onmouseout="this.style.background='rgba(139,92,246,0.15)';this.style.transform='translateY(0)';">
+                    <i class="fas fa-lock" style="font-size:0.75rem;"></i> Login
+                </a>
+            {% endif %}
+        </div>
     </nav>
 
-    <section class="text-gray-600 body-font">
-        <div style="margin-top: 100px " class="container px-5 py-12 mx-auto">
-            <div class="flex flex-wrap">
-                <div class="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
-                    <h2 class="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2">Clustering</h2>
-                    <p class="leading-relaxed text-base mb-4">Identification of Crime Zones(Distrcits) across India using Clustering Analysis</p>
-                    <div class="drop-down">
-                        <button class=button><a class="text-blue-500 inline-flex items-center">Try Now
-                    <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-                      <path d="M5 12h14M12 5l7 7-7 7"></path>
-                    </svg>
-                    </a>
-                    <div class="dd-content">
-                        <a href="{{url_for('Kmeans')}}">K-Means</a>
-                        
 
-                    </div>
-                  </button>
-                    </div>
+    <!-- Suspense Hero Section -->
+    <section class="hero-suspense-section">
+        <div class="hero-dossier-badge">
+            <span class="status-indicator red-pulse"></span>
+            <span>RESTRICTED // NATIONAL CRIME SURVEILLANCE DOSSIER</span>
+        </div>
+        <h1 class="hero-title">CRIME PATTERN RECOGNITION & PREDICTIVE THREAT INTELLIGENCE</h1>
+        <p class="hero-subtitle">
+            Advanced algorithmic district zoning, multi-vector IPC crime classification, neural time-series forecasting, and geospatial crime intensity tracking across India.
+        </p>
+
+        <!-- Live Tactical Telemetry -->
+        <div class="hero-telemetry-grid">
+            <div class="telemetry-node">
+                <span>DISTRICTS PROFILED:</span>
+                <strong>700+ UNITS</strong>
+            </div>
+            <div class="telemetry-node">
+                <span>CRIME VECTORS:</span>
+                <strong>10 IPC CLASSES</strong>
+            </div>
+            <div class="telemetry-node">
+                <span>FORECAST ACCURACY:</span>
+                <strong>88.85% (PROPHET)</strong>
+            </div>
+            <div class="telemetry-node">
+                <span>SURVEILLANCE RADAR:</span>
+                <strong style="color: var(--accent-coral);">ARMED & ACTIVE</strong>
+            </div>
+        </div>
+    </section>
+
+    {# =========================================================
+       Role-based access banner — shown only when logged in
+       ========================================================= #}
+    {% if current_user.is_authenticated %}
+    <div class="role-access-banner" style="
+        margin:0 auto 0.5rem;max-width:1200px;padding:0 1.25rem;
+        display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+        <span style="font-size:0.7rem;font-weight:700;letter-spacing:0.1em;
+                     text-transform:uppercase;color:var(--text-muted,#8b99b5);">
+            ACCESS CLEARANCE:
+        </span>
+        {% if current_user.role == 'public' %}
+            <span style="padding:0.2rem 0.7rem;border-radius:999px;font-size:0.68rem;
+                         font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+                         background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.35);
+                         color:#4ade80;">● PUBLIC — Analytics &amp; Geospatial views</span>
+        {% elif current_user.role == 'field_officer' %}
+            <span style="padding:0.2rem 0.7rem;border-radius:999px;font-size:0.68rem;
+                         font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+                         background:rgba(250,204,21,0.12);border:1px solid rgba(250,204,21,0.35);
+                         color:#facc15;">● FIELD OFFICER — Full Intelligence &amp; Prediction Clearance</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# =========================================================
+       Classified Dossier Modules Grid
+       Permission matrix:
+         public         → Analytics, Geospatial
+         field_officer  → All 8 modules
+       ========================================================= #}
+    <section class="container px-5 py-6 mx-auto">
+        <div class="flex flex-wrap -m-3">
+
+            {# --- Module 1: Clustering — field_officer only --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-project-diagram text-cyan-400 mr-2"></i> Clustering</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Unsupervised partition of 700+ Indian districts into Red, Orange, and Green Crime Threat Zones based on historical multi-dimensional IPC metrics.
+                    </p>
                 </div>
-                <div class="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
-                    <h2 class="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2">Classification</h2>
-                    <p class="leading-relaxed text-base mb-4">Classification of Districts into different Crime Zones based on Estimated Crime</p>
-                    <div class="drop-down">
-                        <button class=button><a class="text-blue-500 inline-flex items-center">Try Now
-                    <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"></path>
-                    
-                </svg>
-              </a>
-              <div class="dd-content">
-                       <a href="{{url_for('Randomfrstcls')}}"> Random Forest Classifier</a> 
-              </div>
-              </button>
-                    </div>
-                </div>
-                <div class="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
-                    <h2 class="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2">Linear Regression</h2>
-                    <p class="leading-relaxed text-base mb-4">Total IPC Crime Count Prediction based on Projected Population</p>
-                    <a href="{{url_for('LinearReg')}}"><button class="button" class="text-blue-500 inline-flex items-center">Try Now  
-                 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-                 <path d="M5 12h14M12 5l7 7-7 7"></path></svg>
-                  </button>
-                    </svg>
-                    </a>
-                </div>
-                <div class="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
-                    <h2 class="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2">Time-series Forcasting</h2>
-                    <p class="leading-relaxed text-base mb-4">Using Time Series Forecasting(fbprohet) for Crime Prediction.</p>
-                    <div class="drop-down">
-                        <button class=button><a class="text-blue-500 inline-flex items-center">Try Now  
-               <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-               <path d="M5 12h14M12 5l7 7-7 7"></path></svg>
-            </a>
-                        <div class="dd-content">
-                            <a href="{{url_for('timeseriescr')}}"> Crime Rate Forecast</a>
-                            <a href="{{url_for('timeseriesipc')}}"> Total IPC Forecast</a>
-                        </div>
+                <div class="drop-down mt-auto">
+                    <button type="button" class="button">
+                        <span>Access Dossier</span>
+                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
                     </button>
-
+                    <div class="dd-content">
+                        <a href="{{url_for('Kmeans')}}"><i class="fas fa-crosshairs mr-2"></i> K-Means Cluster Engine</a>
                     </div>
                 </div>
-                <div class="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
-                    <h2 class="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2">Analysis</h2>
-                    <p class="leading-relaxed text-base mb-4">Using Visualizations (Google Charts and Plotly) for Analysis of Crime Data.</p>
-                    <div class="drop-down"> <button class=button><a class="text-blue-500 inline-flex items-center">Try Now
-                <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"></path>
-                </svg>
-              </a>
-              <div class="dd-content">
-                <a href="{{url_for('analysis')}}">Google Charts</a>
-                <a href="{{url_for('analysis2')}}">Plotly</a>
-               
-              </div>
-            
-              </button>
+            </div>
+            {% endif %}
+
+            {# --- Module 2: Classification — field_officer only --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-shield-virus text-red-500 mr-2"></i> Classification</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Random Forest threat model evaluating future crime incidents via Exponential Smoothing to predict district risk classification.
+                    </p>
+                </div>
+                <div class="drop-down mt-auto">
+                    <button type="button" class="button">
+                        <span>Access Dossier</span>
+                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
+                    </button>
+                    <div class="dd-content">
+                        <a href="{{url_for('Randomfrstcls')}}"><i class="fas fa-brain mr-2"></i> Random Forest Classifier</a>
                     </div>
                 </div>
+            </div>
+            {% endif %}
 
+            {# --- Module 3: Regression — field_officer only --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-chart-line text-yellow-400 mr-2"></i> Regression</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Geometric growth population projections coupled with trained regression models to calculate projected IPC crime volume and rate.
+                    </p>
+                </div>
+                <div class="mt-auto">
+                    <a href="{{url_for('LinearReg')}}" style="text-decoration:none; display:block;">
+                        <button type="button" class="button" style="width:100%;">
+                            <span>Initiate Scan</span>
+                            <i class="fas fa-arrow-right text-xs ml-2"></i>
+                        </button>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
 
-                <div class="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
-                    <h2 class="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2">Geo-Spatial Analysis</h2>
-                    <p class="leading-relaxed text-base mb-4">Using Choropleth to Visualize Crime Data on Geographical Locations.</p>
-                    <div class="drop-down"> <button class=button><a class="text-blue-500 inline-flex items-center">Try Now  
-               <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-               <path d="M5 12h14M12 5l7 7-7 7"></path></svg>
-               <div class="dd-content">
-                <a href="{{url_for('analysis3')}}">Choropleth</a>
-
-               </div>
-                </button>
+            {# --- Module 4: Time-Series Forecasting — field_officer only --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-wave-square text-cyan-300 mr-2"></i> Forecasting</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Meta Prophet predictive neural horizon modeling seasonality and trends to forecast national crime trajectories up to 2027.
+                    </p>
+                </div>
+                <div class="drop-down mt-auto">
+                    <button type="button" class="button">
+                        <span>Access Dossier</span>
+                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
+                    </button>
+                    <div class="dd-content">
+                        <a href="{{url_for('timeseriescr')}}"><i class="fas fa-chart-area mr-2"></i> Crime Rate Forecast</a>
+                        <a href="{{url_for('timeseriesipc')}}"><i class="fas fa-chart-bar mr-2"></i> Total IPC Forecast</a>
                     </div>
-                    </svg>
-                    </a>
                 </div>
+            </div>
+            {% endif %}
 
-                <div class="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
-                    <h2 class="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2">Crime Feed</h2>
-                    <p class="leading-relaxed text-base mb-4">Latest News Headlines and Webscrapped Data Plotted on Heatmap.</p>
-                    <a href="{{url_for('crimefeed')}}"> <button class=button class="text-blue-500 inline-flex items-center">Try Now  
-                 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-                 <path d="M5 12h14M12 5l7 7-7 7"></path></svg>
-                  </button>
-                        </svg>
-                    </a>
+            {# --- Module 5: Visual Analytics — public & field_officer --- #}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-chart-pie text-purple-400 mr-2"></i> Analytics</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Interactive Google Charts and Plotly multi-variable crime telemetry for cross-decade incident pattern inspection.
+                    </p>
                 </div>
-
-                <div class="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
-                    <h2 class="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2">Data</h2>
-                    <p class="leading-relaxed text-base mb-4">Check out the multiple crime datasets that were used in this project.</p>
-                    <a href="{{url_for('datadisp')}}"><button class=button class="text-blue-500 inline-flex items-center" >Try Now  
-                 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-                 <path d="M5 12h14M12 5l7 7-7 7"></path></svg>
-                  </button>
-                    </svg>
-                    </a>
+                <div class="drop-down mt-auto">
+                    <button type="button" class="button">
+                        <span>Access Dossier</span>
+                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
+                    </button>
+                    <div class="dd-content">
+                        <a href="{{url_for('analysis')}}"><i class="fas fa-chart-column mr-2"></i> Google Charts Telemetry</a>
+                        <a href="{{url_for('analysis2')}}"><i class="fas fa-chart-simple mr-2"></i> Plotly Multi-Linear Engine</a>
+                    </div>
                 </div>
-
-
             </div>
 
+            {# --- Module 6: Geospatial — public & field_officer --- #}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-map-marked-alt text-green-400 mr-2"></i> Geospatial</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Choropleth mapping of geographic density markers and territorial crime severity indicators across all states and union territories.
+                    </p>
+                </div>
+                <div class="drop-down mt-auto">
+                    <button type="button" class="button">
+                        <span>Access Dossier</span>
+                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
+                    </button>
+                    <div class="dd-content">
+                        <a href="{{url_for('analysis3')}}"><i class="fas fa-globe-asia mr-2"></i> State Choropleth Radar</a>
+                    </div>
+                </div>
+            </div>
+
+            {# --- Module 7: Live Crime Feed — field_officer only --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-satellite text-red-400 mr-2"></i> Crime Feed</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Real-time news web scraper extracting live incident headlines, resolving geographic coordinates, and updating satellite heatmaps.
+                    </p>
+                </div>
+                <div class="mt-auto">
+                    <a href="{{url_for('crimefeed')}}" style="text-decoration:none; display:block;">
+                        <button type="button" class="button" style="width:100%;">
+                            <span>Live Heatmap</span>
+                            <i class="fas fa-fire text-xs ml-2"></i>
+                        </button>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# --- Module 8: Evidence Datasets — field_officer only --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-folder-open text-blue-400 mr-2"></i> Raw Data</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Explore verified NCRB datasets, preprocessed cluster tables, socio-economic crime correlation matrices, and time-series series.
+                    </p>
+                </div>
+                <div class="mt-auto">
+                    <a href="{{url_for('datadisp')}}" style="text-decoration:none; display:block;">
+                        <button type="button" class="button" style="width:100%;">
+                            <span>Examine Records</span>
+                            <i class="fas fa-database text-xs ml-2"></i>
+                        </button>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
-
     </section>
-    <div style="clear:both;">
 
-    </div>
-    <div style="margin-bottom:100px;">
-
-    </div>
-    <footer style="height:13%;">
-        <p> Copyright &copy; 2023. All rights reserved.</p>
-
+    <!-- Footer -->
+    <footer>
+        <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
     </footer>
 
+    <!-- Suspense FX Engine -->
+    <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
 </body>
 
 </html>

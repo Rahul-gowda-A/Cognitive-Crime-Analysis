@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Crime Analysis Platform</title>
+  <meta name="description" content="Secure login portal for the Crime Analysis & Prediction platform. Role-based access for public users, field officers, and analysts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep:       #080a14;
+      --bg-panel:      #0d0f1e;
+      --bg-card:       #13162a;
+      --bg-input:      #1a1d33;
+      --border:        rgba(255, 255, 255, 0.07);
+      --border-focus:  rgba(139, 92, 246, 0.6);
+
+      --purple-400:    #a78bfa;
+      --purple-500:    #8b5cf6;
+      --purple-600:    #7c3aed;
+      --cyan-400:      #22d3ee;
+      --cyan-500:      #06b6d4;
+      --pink-400:      #f472b6;
+      --green-400:     #4ade80;
+      --yellow-400:    #facc15;
+      --red-400:       #f87171;
+
+      --text-primary:  #f1f5f9;
+      --text-muted:    #8b99b5;
+      --text-dim:      #4a5568;
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-deep);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* ===== Background grid + glow ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(139, 92, 246, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: -10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== Layout ===== */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 460px;
+    }
+
+    /* ===== Brand Header ===== */
+    .brand {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .brand-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+      margin-bottom: 1rem;
+      box-shadow: 0 0 32px rgba(139, 92, 246, 0.5);
+      font-size: 1.75rem;
+    }
+
+    .brand h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--purple-400), var(--cyan-400));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* ===== Card ===== */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.25rem 2rem;
+      box-shadow:
+        0 4px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(139, 92, 246, 0.08) inset;
+      animation: fadeUp 0.6s ease 0.1s both;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.75rem;
+    }
+
+    /* ===== Flash Messages ===== */
+    .flash-block {
+      margin-bottom: 1.25rem;
+    }
+
+    .flash {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border: 1px solid;
+      animation: flashIn 0.4s ease both;
+    }
+
+    .flash.danger {
+      background: rgba(248, 113, 113, 0.1);
+      border-color: rgba(248, 113, 113, 0.35);
+      color: var(--red-400);
+    }
+
+    .flash.info {
+      background: rgba(34, 211, 238, 0.08);
+      border-color: rgba(34, 211, 238, 0.3);
+      color: var(--cyan-400);
+    }
+
+    .flash.success {
+      background: rgba(74, 222, 128, 0.08);
+      border-color: rgba(74, 222, 128, 0.3);
+      color: var(--green-400);
+    }
+
+    .flash-icon { font-size: 1rem; flex-shrink: 0; }
+
+    /* ===== Form ===== */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--text-dim);
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.6rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    }
+
+    input[type="text"]:focus + .input-icon,
+    input[type="password"]:focus + .input-icon {
+      color: var(--purple-400);
+    }
+
+    /* icon is *before* the input, so need adjacent sibling on wrapper */
+    .input-wrapper:focus-within .input-icon {
+      color: var(--purple-400);
+    }
+
+    input::placeholder { color: var(--text-dim); }
+
+    /* ===== Submit Button ===== */
+    .btn-login {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+      margin-top: 0.5rem;
+    }
+
+    .btn-login:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(139, 92, 246, 0.55);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    /* ===== Divider ===== */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.75rem 0 1.25rem;
+      color: var(--text-dim);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ===== Demo Credentials ===== */
+    .demo-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.9rem;
+    }
+
+    .demo-badges {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .demo-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      text-align: left;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .demo-badge:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateX(3px);
+    }
+
+    .demo-badge.public:hover    { border-color: rgba(74, 222, 128, 0.4); }
+    .demo-badge.officer:hover   { border-color: rgba(250, 204, 21, 0.4); }
+    .demo-badge.analyst:hover   { border-color: rgba(167, 139, 250, 0.4); }
+
+    .badge-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .badge-dot.public  { background: var(--green-400);  box-shadow: 0 0 6px var(--green-400); }
+    .badge-dot.officer { background: var(--yellow-400); box-shadow: 0 0 6px var(--yellow-400); }
+    .badge-dot.analyst { background: var(--purple-400); box-shadow: 0 0 6px var(--purple-400); }
+
+    .badge-info { flex: 1; }
+
+    .badge-role {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .badge-role.public  { color: var(--green-400); }
+    .badge-role.officer { color: var(--yellow-400); }
+    .badge-role.analyst { color: var(--purple-400); }
+
+    .badge-creds {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .badge-arrow {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* ===== Footer ===== */
+    .login-footer {
+      text-align: center;
+      margin-top: 1.75rem;
+      font-size: 0.73rem;
+      color: var(--text-dim);
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    /* ===== Animations ===== */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes flashIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      .card { padding: 1.75rem 1.25rem; }
+      .brand h1 { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="login-container">
+
+      <!-- Brand -->
+      <div class="brand">
+        <div class="brand-icon">🔍</div>
+        <h1>Crime Analysis Platform</h1>
+        <p>Secure Access Portal &nbsp;·&nbsp; Role-Based Control</p>
+      </div>
+
+      <!-- Login Card -->
+      <div class="card">
+        <h2 class="card-title">Sign In</h2>
+        <p class="card-subtitle">Enter your credentials to continue</p>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-block">
+              {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                  {% if category == 'danger' %}
+                    <span class="flash-icon">⚠️</span>
+                  {% elif category == 'info' %}
+                    <span class="flash-icon">ℹ️</span>
+                  {% else %}
+                    <span class="flash-icon">✅</span>
+                  {% endif %}
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Login Form -->
+        <form id="loginForm" method="POST" action="{{ url_for('login') }}" novalidate>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Enter your username"
+                autocomplete="username"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login" id="loginBtn">
+            Sign In &nbsp;→
+          </button>
+        </form>
+
+        <!-- Demo Credentials -->
+        <div class="divider">Demo Accounts</div>
+        <p class="demo-title">Click a badge to autofill credentials</p>
+
+        <div class="demo-badges">
+          <!-- Public User -->
+          <button
+            class="demo-badge public"
+            type="button"
+            onclick="fillCredentials('public_user', 'public123')"
+            aria-label="Autofill public user credentials"
+          >
+            <span class="badge-dot public"></span>
+            <div class="badge-info">
+              <div class="badge-role public">Public User</div>
+              <div class="badge-creds">public_user &nbsp;/&nbsp; public123</div>
+            </div>
+            <span class="badge-arrow">↗</span>
+          </button>
+
+          <!-- Field Officer -->
+          <button
+            class="demo-badge officer"
+            type="button"
+            onclick="fillCredentials('field_officer', 'officer123')"
+            aria-label="Autofill field officer credentials"
+          >
+            <span class="badge-dot officer"></span>
+            <div class="badge-info">
+              <div class="badge-role officer">Field Officer</div>
+              <div class="badge-creds">field_officer &nbsp;/&nbsp; officer123</div>
+            </div>
+            <span class="badge-arrow">↗</span>
+          </button>
+        </div>
+      </div><!-- /card -->
+
+      <p class="login-footer">
+        Crime Analysis &amp; Prediction System &nbsp;·&nbsp; Restricted Access
+      </p>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Autofill the login form with demo credentials when a badge is clicked.
+     */
+    function fillCredentials(username, password) {
+      document.getElementById('username').value = username;
+      document.getElementById('password').value = password;
+      document.getElementById('username').focus();
+    }
+
+    /**
+     * Reset the submit button to its default state.
+     * Called on pageshow so the button is never left stuck after:
+     *   - browser back navigation
+     *   - a failed login redirect
+     *   - bfcache page restoration
+     */
+    function resetLoginBtn() {
+      const btn = document.getElementById('loginBtn');
+      btn.textContent = 'Sign In \u00a0\u2192';
+      btn.disabled = false;
+    }
+
+    // Reset every time this page becomes visible (covers back-button / bfcache)
+    window.addEventListener('pageshow', function (event) {
+      resetLoginBtn();
+    });
+
+    // Visual feedback on form submit (standard POST — no unhandled promises)
+    document.getElementById('loginForm').addEventListener('submit', function () {
+      const btn = document.getElementById('loginBtn');
+      btn.textContent = 'Signing in\u2026';
+      btn.disabled = true;
+    });
+  </script>
+</body>
+</html>

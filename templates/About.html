@@ -5,187 +5,128 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us</title>
+    <title>Classified Dossier // Operation & Architectural Brief</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/K-means.css')}}">
-    <!-- header footer  script -->
 
-
-
-    <script src="https://kit.fontawesome.com/07e47d8e81.js" crossorigin="anonymous"></script>
-    <script src="neumorphism/html&css/assets/js/neumorphism.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-    <link href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'>
-    <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js'></script>
-
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-    <script src="/index.php"></script>
-    <!-- -----------------icons---------------- -->
     <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
-
-
-    <script src="https://cdn.lordicon.com/libs/frhvbuzj/lord-icon-2.0.2.js"></script>
-
-
-
-
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 
 <body>
-
+    <!-- Main Navigation Bar -->
     <nav class="main">
-        <label class="logo" href="{{url_for('index')}}" style="margin-left:0;">CRIME ANALYSIS</label>
+        <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-            <li>
-                <a href="{{url_for('index')}}">Home</a>
-            </li>
-            <li><a href="{{url_for('about')}}">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Feedback</a></li>
+            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
+            <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
+            <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
     </nav>
-    <div class="container-fluid"> </div>
-    <div class="row pt-6">
 
+    <!-- Sub Navigation -->
+    <nav class="secondnav">
+        <label class="log"><i class="fas fa-shield-alt mr-2"></i> OPERATION DOSSIER // MISSION OBJECTIVES & ARCHITECTURE</label>
+    </nav>
 
-    </div>
-
-    <!-- ----------------------------------------------------------------------Accordion---------------------------------------------------->
-    <div class="row pl-6 pr-6 pb-6">
-        <div class="col-6">
-            <div class="card bg-primary border-light shadow-soft" style="width: 600px;">
-                <div class="card-body">
-
-                    <h3 class="h5 card-title mt-3" style="font-size: 32px;font-weight: 1000; margin-top: 100px;">Why is it needed? </h3>
-                    <p class="card-text"> Trends of crimes in India keep changing with the growing population and rapid development of towns and cities. To curb crime, the Police need countless hours to go through the crime data. There is a necessity for tools that can help
-                        us analyze and predict crime rate in order to ensure proper surveillance. Common people can also understand the crime rate and trends without going through the large clusters of data and jargons. By spotting the crime prone areas
-                        the general public can be given an alert about the crimes in different parts of a country.The data used for our system provides all necessary information about crimes, required for our analysis. Using this data, we will be able
-                        to provide inferences and draw decisions on the severity and location of the crime.
-                    </p>
+    <div class="container mx-auto px-4 py-12 max-w-6xl">
+        
+        <!-- Dossier Section 1: Problem & Purpose -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-12">
+            <div class="p-8 rounded-xl bg-gray-900 border border-cyan-900 shadow-2xl backdrop-blur-md relative">
+                <div class="hero-dossier-badge mb-3">
+                    <span class="status-indicator red-pulse"></span>
+                    <span>MISSION PURPOSE</span>
                 </div>
+                <h3 style="font-family: var(--font-cyber); font-size: 22px; color: #ffffff; letter-spacing: 2px;" class="mb-4">
+                    Why is Automated Crime Intelligence Imperative?
+                </h3>
+                <p style="font-family: var(--font-sans); font-size: 14px; color: var(--text-muted); line-height: 1.7;">
+                    Crime patterns across Indian districts evolve rapidly alongside demographic shifts and urban expansion. Law enforcement personnel spend countless hours processing raw statistical logs manually. Our predictive intelligence framework automates crime hotspot clustering, multi-variable severity classification, and future incident trajectories—empowering law enforcement and citizens with actionable threat intelligence.
+                </p>
             </div>
-        </div>
-        <div class="col-1 pt-5">
-            <div class="card bg-primary border-light shadow-soft" style="background-color: black; height: 300px; width: 5px;">
-            </div>
-        </div>
-        <div class="col-5  ">
-            <div>
-                <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-                <lottie-player src="https://assets4.lottiefiles.com/packages/lf20_2UeWRZ.json" background="transparent" speed="1" style="width: 400px; height: 400px;" loop autoplay></lottie-player>
-            </div>
-        </div>
-    </div>
-
-    <div class="row pl-6 pr-3 pb-6">
-        <div class="col-5 pl-7">
-            <div>
-                <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-                <lottie-player src="https://assets3.lottiefiles.com/private_files/lf30_kifrjgdc.json" background="transparent" speed="1" style="width: 400px; height: 400px;" loop autoplay>
-                </lottie-player>
-            </div>
-        </div>
-        <div class="col-1 pt-5" style="padding-left: 101px;">
-            <div class="card bg-primary border-light shadow-soft" style="background-color: black; height: 300px; width: 5px;">
+            <div class="flex justify-center">
+                <lottie-player src="https://assets4.lottiefiles.com/packages/lf20_2UeWRZ.json" background="transparent" speed="1" style="width: 380px; height: 380px;" loop autoplay></lottie-player>
             </div>
         </div>
 
-        <div class="col-6 pl-6">
-            <div class="card bg-primary border-light shadow-soft" style="width: 600px;">
-                <div class="card-body">
-
-                    <h3 class="h5 card-title mt-3" style="font-size: 32px;font-weight: 1000;">Who will be benifitted?
-                    </h3>
-                    <p class="card-text">&nbsp; • It can help us to analyze and perform comparative study in crime rate and infer various useful conclusions. <br>&nbsp; • The prediction model will help to get a better idea to possible crime rate in near future.<br> &nbsp;
-                        • By spotting the crime prone areas the general public can be given an alert about the crimes in different parts of a country.<br>&nbsp; • It can help the concerned authorities to analyze and predict crime rate in order to ensure
-                        proper surveillance.<br>&nbsp; • The data set developed by us over a period of time through web scraping can be further used for research.<br>&nbsp;
-                    </p>
+        <!-- Dossier Section 2: Beneficiaries -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-12">
+            <div class="flex justify-center order-2 md:order-1">
+                <lottie-player src="https://assets3.lottiefiles.com/private_files/lf30_kifrjgdc.json" background="transparent" speed="1" style="width: 380px; height: 380px;" loop autoplay></lottie-player>
+            </div>
+            <div class="p-8 rounded-xl bg-gray-900 border border-cyan-900 shadow-2xl backdrop-blur-md order-1 md:order-2">
+                <div class="hero-dossier-badge mb-3">
+                    <span class="status-indicator red-pulse"></span>
+                    <span>STAKEHOLDER IMPACT</span>
                 </div>
+                <h3 style="font-family: var(--font-cyber); font-size: 22px; color: #ffffff; letter-spacing: 2px;" class="mb-4">
+                    Target Jurisdictions & Beneficiaries
+                </h3>
+                <ul class="text-sm text-gray-300 space-y-3 font-sans">
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-cyan-400 mt-1"></i>
+                        <span><strong>Law Enforcement & Policymakers:</strong> Optimize tactical patrol deployments and allocate emergency resources to predicted Red Zones.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-cyan-400 mt-1"></i>
+                        <span><strong>General Public:</strong> Receive real-time zone awareness and incident risk levels before transit or relocation.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-cyan-400 mt-1"></i>
+                        <span><strong>Criminology Researchers:</strong> Leverage multi-decade normalized datasets and OSINT web-scraped geospatial feeds for empirical studies.</span>
+                    </li>
+                </ul>
             </div>
         </div>
-    </div>
 
-    <div class="row pl-6 pr-6 pb-6">
-        <div class="col-6">
-            <div class="card bg-primary border-light shadow-soft" style="width: 600px;">
-                <div class="card-body">
-                    <h3 class="h5 card-title mt-3" style="font-size: 32px;font-weight: 1000;">Which technologies are used ?</h3>
-                    <p class="card-text">To develop this project, we have used Python, Machine Learning Techniques, Flask framework, web scraping and selenium, charts, Beautiful soup library, pandas, FB Prophet library for implementing maps and Machine Learning.<br> &nbsp; • Data Analysis is the
-                        process of bringing order and structure to collected data. It turns data into information teams can use.<br> &nbsp; • Data visualization is the process of putting data into a chart, graph, or other visual format that helps inform
-                        analysis and interpretation.<br> &nbsp; • Web scraping is the process to extract content and data from a website.
-                        <br> &nbsp; • Predictive analysis is used tp analyze existing data, work out patterns and predict future outcomes or trends.<br> &nbsp;
-
-                    </p>
+        <!-- Dossier Section 3: Technology Architecture -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-12">
+            <div class="p-8 rounded-xl bg-gray-900 border border-cyan-900 shadow-2xl backdrop-blur-md">
+                <div class="hero-dossier-badge mb-3">
+                    <span class="status-indicator red-pulse"></span>
+                    <span>TECHNOLOGY STACK</span>
                 </div>
-            </div>
-        </div>
-        <div class="col-1 pt-5">
-            <div class="card bg-primary border-light shadow-soft" style="background-color: black; height: 300px; width: 5px;">
-            </div>
-        </div>
-        <div class="col-5  ">
-            <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-            <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_xsnsvpbs.json" background="transparent" speed="1" style="width: 400px; height: 400px;" loop autoplay></lottie-player>
-        </div>
-    </div>
-  
-
-    
-
-        <div class="contact-us-image pt-4" style="width: 500px;">
-            <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-            <lottie-player src="https://assets6.lottiefiles.com/packages/lf20_gzl797gs.json" background="transparent" speed="1" style="width: 500px; height: 500px;" loop autoplay></lottie-player>
-        </div>
-
-
-    </div>
-
-
-
-    <!------------------------------------------------------------Feedback-------------------------------------------------------------------->
-    <div class="feedback-panel" style="    display: flex;
-    flex-direction: row;
-    align-content: center;
-    justify-content: center;">
-
-
-        <div class="col-5 pr-6 pt-7 ">
-            <div class="card bg-primary shadow-soft border-light ">
-                <div class="card-body px-5 py-5 text-center text-md-left">
-                    <div class="row ">
-                        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfGOGp2Q9oELy_IZ0P79xcA_rpxMaDazM63chlCh_gMl_NCIg/viewform?embedded=true" width="450" height="450" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+                <h3 style="font-family: var(--font-cyber); font-size: 22px; color: #ffffff; letter-spacing: 2px;" class="mb-4">
+                    Forensic AI & Computational Pipeline
+                </h3>
+                <p style="font-family: var(--font-sans); font-size: 14px; color: var(--text-muted); line-height: 1.7;" class="mb-4">
+                    Engineered with modern full-stack data science tools:
+                </p>
+                <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+                    <div class="p-3 bg-gray-950 border border-gray-800 rounded text-cyan-300">
+                        <i class="fab fa-python mr-1"></i> Python & Flask Backend
+                    </div>
+                    <div class="p-3 bg-gray-950 border border-gray-800 rounded text-cyan-300">
+                        <i class="fas fa-brain mr-1"></i> Scikit-Learn & Prophet
+                    </div>
+                    <div class="p-3 bg-gray-950 border border-gray-800 rounded text-cyan-300">
+                        <i class="fas fa-map mr-1"></i> Folium Geospatial Maps
+                    </div>
+                    <div class="p-3 bg-gray-950 border border-gray-800 rounded text-cyan-300">
+                        <i class="fas fa-chart-line mr-1"></i> Google Charts & Plotly
                     </div>
                 </div>
             </div>
+            <div class="flex justify-center">
+                <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_xsnsvpbs.json" background="transparent" speed="1" style="width: 380px; height: 380px;" loop autoplay></lottie-player>
+            </div>
         </div>
-
-        <div class="feedback-panel pt-4" style="width: 500px; height: 500px;">
-            <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-            <lottie-player src="https://assets9.lottiefiles.com/private_files/lf30_ltuqrtmn.json" background="transparent" speed="1" style="width: 750px; height: 750px;" loop autoplay>
-            </lottie-player>
-        </div>
-
-
-
 
     </div>
 
-    <!------------------------------------------------------------Feedback-------------------------------------------------------------------->
+    <!-- Footer -->
+    <footer>
+        <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
+    </footer>
 
-
-    <div class="row">
-        <div class="col-3"></div>
-        <div class="col-6">
-
-        </div>
-        <div class="col-3"></div>
-    </div>
-
-
-    <my-footer></my-footer>
-
+    <!-- Suspense FX Script -->
+    <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
 </body>
 
 </html>

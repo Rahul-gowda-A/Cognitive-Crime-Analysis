@@ -1,0 +1,11 @@
+.venv/
+.venv-*/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+instance/
+.vscode/
+.idea/
+*.sqlite3
+*.db

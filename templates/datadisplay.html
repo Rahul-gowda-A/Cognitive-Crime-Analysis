@@ -5,60 +5,74 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data display</title>
+    <title>Classified Datasets // Evidence Archives</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/table.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/K-means.css')}}">
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="{{url_for('static',filename='javascript/linearregression.js')}}"></script>
     <script src="{{url_for('static',filename='javascript/table.js')}}"></script>
-
-
+    <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
 </head>
-<style>
-    .button {
-        margin-bottom: 20px;
-    }
-</style>
 
 <body onload="linearr()">
+    <!-- Main Navigation Bar -->
     <nav class="main">
-        <a href="{{url_for('index')}}"><label style="margin-left:0;"class="logo">CRIME ANALYSIS</label></a>
+        <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-
-            <li><a href="{{url_for('index')}}">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Feedback</a></li>
+            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
+            <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
+            <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
     </nav>
 
-    <div class="toggle-button" style="margin-top:100px; display: inline-block; margin-bottom:30px;">
-        <button class="button" onclick="kmeans()">K-Means</button>
-        <button class="button" onclick="linearr()">Linear Regression</button>
-        <button class="button" onclick="classification()">Classification</button>
-        <button class="button" onclick="timeseries1()">Time-Series</button>
-        <button class="button" onclick="analysis()">Analysis</button>
+    <!-- Sub Navigation -->
+    <nav class="secondnav">
+        <label class="log"><i class="fas fa-database mr-2"></i> CLASSIFIED CRIME DATASETS & EVIDENCE REGISTRIES</label>
+    </nav>
 
-
-
-    </div>
-
-
-    <div class="info-area" style="margin-top:30px;">
-        <div class="right" style="margin-top: 40px; margin:0px 30px;">
-            <h2 style="margin-bottom:20px;">Datasets Used:</h2>
-            <div class="table-wrapper" id="csv-data"></div>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- Dataset Selector Switches -->
+        <div class="toggle-button">
+            <button class="button" onclick="kmeans()"><i class="fas fa-project-diagram mr-2"></i> K-Means Clusters</button>
+            <button class="button" onclick="linearr()"><i class="fas fa-chart-line mr-2"></i> Population & Regression</button>
+            <button class="button" onclick="classification()"><i class="fas fa-shield-virus mr-2"></i> Multi-Crime Classification</button>
+            <button class="button" onclick="timeseries1()"><i class="fas fa-wave-square mr-2"></i> Time-Series Historic</button>
+            <button class="button" onclick="analysis()"><i class="fas fa-chart-pie mr-2"></i> Bar Analytics Data</button>
         </div>
+
+        <!-- Table Container -->
+        <div class="box p-6">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
+                <span style="font-family: var(--font-cyber); font-size: 15px; color: var(--accent-cyan); letter-spacing: 2px;">
+                    <i class="fas fa-table mr-2"></i> ACTIVE DATA MATRIX REGISTRY
+                </span>
+                <span class="text-xs font-mono text-gray-400">STATUS: VERIFIED NCRB RECORDS</span>
+            </div>
+            
+            <div class="table-wrapper" id="csv-data">
+                <div class="text-center py-12 text-gray-400 font-mono">
+                    <i class="fas fa-spinner fa-spin mr-2"></i> Initializing Data Stream...
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- Footer -->
     <footer>
-        <p> Copyright &copy; 2023. All rights reserved.</p>
+        <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
     </footer>
-</body>
 
+    <!-- Suspense FX Script -->
+    <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
+</body>
 
 </html>

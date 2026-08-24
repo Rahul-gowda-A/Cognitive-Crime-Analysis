@@ -6,19 +6,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crime Data Visualization</title>
+    <title>Crime Data Analytics // Google Visual Telemetry</title>
+    
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/K-means.css')}}">
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
+
     <script type="text/javascript">
         google.charts.load('current', {
-            'packages': ['bar']
-        });
-
-        google.charts.load('current', {
-            packages: ['corechart']
+            'packages': ['bar', 'corechart']
         });
         google.charts.setOnLoadCallback(drawChart1);
 
@@ -44,50 +44,39 @@
             var options = {
                 chart: {
                     title: `${crimeType} CASES REPORTED IN ${state} (2001-2012)`,
-                    curveType: 'function',
-                    legend: {
-                        position: 'bottom'
-                    }
                 },
-                bars: 'vertical' // Required for Material Bar Charts.
+                bars: 'vertical',
+                colors: ['#00e5ff', '#ff1744'],
+                backgroundColor: 'transparent',
+                chartArea: { width: '85%', height: '75%' }
             };
 
             var chart = new google.charts.Bar(document.getElementById('chart_div'));
-
             chart.draw(data, google.charts.Bar.convertOptions(options));
         }
 
         function drawChart2() {
-            // Fetch JSON data and plot chart
             fetch('./static/javascript/BarAnalysis.json')
                 .then(response => response.json())
                 .then(data => {
-                    // Get user inputs
                     const state = document.getElementById('state').value;
                     const crimeType = document.getElementById('crimeType').value;
 
-                    // Filter data by state and crime type
                     const filteredData = data.filter(entry => entry['STATE/UT'] === state && entry[crimeType]);
-
-                    // Create chart data
                     const chartData = filteredData.map(entry => [entry['YEAR'].toString(), entry[crimeType]]);
                     chartData.unshift(['Year', crimeType]);
 
-                    // Create chart options
                     var chartOptions = {
                         title: `${crimeType} CASES REPORTED IN ${state} (2001-2012)`,
                         curveType: 'function',
-                        legend: {
-                            position: 'bottom',
-                        },
-                        'chartArea': {
-                            width: '90%',
-                            height: '80%',
-                            top: 25
-                        }
+                        legend: { position: 'bottom', textStyle: { color: '#e2e8f0' } },
+                        backgroundColor: 'transparent',
+                        colors: ['#00e5ff'],
+                        hAxis: { textStyle: { color: '#94a3b8' } },
+                        vAxis: { textStyle: { color: '#94a3b8' } },
+                        titleTextStyle: { color: '#ffffff', fontSize: 14 },
+                        chartArea: { width: '85%', height: '70%', top: 30 }
                     };
-
-                    // Create chart and add to HTML element
 
                     const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
                     chart.draw(google.visualization.arrayToDataTable(chartData), chartOptions);
@@ -96,96 +85,125 @@
         }
     </script>
 </head>
-<style>
-    .select-container {
-        display: inline-block;
-        margin-right: 60px;
-    }
-</style>
 
 <body>
+    <!-- Main Navigation Bar -->
     <nav class="main">
-        <a href="{{url_for('index')}}"><label style="margin-left:0;"class="logo">CRIME ANALYSIS</label></a>
+        <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-            <li><a href="{{url_for('index')}}">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Feedback</a></li>
+            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
+            <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
+            <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
-
-        <nav class="secondnav">
-            <label class="log" href="#"> CHARTS</label>
-        </nav>
     </nav>
-    <div style="margin-left:270px; margin-top:150px;">
-        <div class="select-container">
 
-            <label for="state">State:</label>
-            <select id="state" name="state">
-        <option value="ANDHRA PRADESH">ANDHRA PRADESH</option>
-        <option value="ARUNACHAL PRADESH">ARUNACHAL PRADESH</option>
-        <option value="ASSAM">ASSAM</option>
-        <option value="BIHAR">BIHAR</option>
-        <option value="CHHATTISGARH">CHHATTISGARH</option>
-        <option value="GOA">GOA</option>
-        <option value="GUJARAT">GUJARAT</option>
-        <option value="HARYANA">HARYANA</option>
-        <option value="HIMACHAL PRADESH">HIMACHAL PRADESH</option>
-        <option value="JAMMU & KASHMIR">JAMMU & KASHMIR</option>
-        <option value="JHARKHAND">JHARKHAND</option>
-        <option value="KARNATAKA">KARNATAKA</option>
-        <option value="KERALA">KERALA</option>
-        <option value="MADHYA PRADESH">MADHYA PRADESH</option>
-        <option value="MAHARASHTRA">MAHARASHTRA</option>
-        <option value="MANIPUR">MANIPUR</option>
-        <option value="MEGHALAYA">MEGHALAYA</option>
-        <option value="MIZORAM">MIZORAM</option>
-        <option value="NAGALAND">NAGALAND</option>
-        <option value="ODISHA">ODISHA</option>
-        <option value="PUNJAB">PUNJAB</option>
-        <option value="RAJASTHAN">RAJASTHAN</option>
-        <option value="SIKKIM">SIKKIM</option>
-        <option value="TAMIL NADU">TAMIL NADU</option>
-        <option value="TRIPURA">TRIPURA</option>
-        <option value="UTTAR PRADESH">UTTAR PRADESH</option>
-        <option value="UTTARAKHAND">UTTARAKHAND</option>
-        <option value="WEST BENGAL">WEST BENGAL</option>
-        <option value="A & N ISLANDS">A & N ISLANDS</option>
-        <option value="CHANDIGARH">CHANDIGARH</option>
-        <option value="D & N HAVELI">D & N HAVELI</option>
-        <option value="DAMAN & DIU">DAMAN & DIU</option>
-        <option value="LAKSHADWEEP">LAKSHADWEEP</option>
-        <option value="PUDUCHERRY">PUDUCHERRY</option>
+    <!-- Sub Navigation -->
+    <nav class="secondnav">
+        <label class="log"><i class="fas fa-chart-pie mr-2"></i> HISTORICAL INCIDENT TELEMETRY // GOOGLE VISUAL ANALYTICS</label>
+    </nav>
 
-      </select>
-        </div>
-        <div class="select-container">
-
-            <label for="crimeType">Crime:</label>
-            <select id="crimeType" name="crimeType">
-        <option value="MURDER">MURDER</option>
-        <option value="ATTEMPT TO MURDER">ATTEMPT TO MURDER</option>
-        <option value="RAPE">RAPE</option>
-        <option value="KIDNAPPING & ABDUCTION">KIDNAPPING & ABDUCTION</option>
-        <option value="DACOITY">DACOITY</option>
-        <option value="ROBBERY">ROBBERY</option>
-        <option value="THEFT">THEFT</option>
-        <option value="HURT/GREVIOUS HURT">HURT/GREVIOUS HURT</option>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
         
-      </select>
+        <!-- Controls & Selectors Strip -->
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-xl mb-6">
+            <div class="hero-dossier-badge mb-4">
+                <span class="status-indicator red-pulse"></span>
+                <span>TELEMETRY QUERY INTERROGATION</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                <div class="for-select m-0">
+                    <label for="state"><i class="fas fa-map-marker-alt mr-1"></i> State / UT:</label>
+                    <select id="state" name="state" onchange="drawChart1()">
+                        <option value="ANDHRA PRADESH">ANDHRA PRADESH</option>
+                        <option value="ARUNACHAL PRADESH">ARUNACHAL PRADESH</option>
+                        <option value="ASSAM">ASSAM</option>
+                        <option value="BIHAR">BIHAR</option>
+                        <option value="CHHATTISGARH">CHHATTISGARH</option>
+                        <option value="GOA">GOA</option>
+                        <option value="GUJARAT">GUJARAT</option>
+                        <option value="HARYANA">HARYANA</option>
+                        <option value="HIMACHAL PRADESH">HIMACHAL PRADESH</option>
+                        <option value="JAMMU & KASHMIR">JAMMU & KASHMIR</option>
+                        <option value="JHARKHAND">JHARKHAND</option>
+                        <option value="KARNATAKA" selected>KARNATAKA</option>
+                        <option value="KERALA">KERALA</option>
+                        <option value="MADHYA PRADESH">MADHYA PRADESH</option>
+                        <option value="MAHARASHTRA">MAHARASHTRA</option>
+                        <option value="MANIPUR">MANIPUR</option>
+                        <option value="MEGHALAYA">MEGHALAYA</option>
+                        <option value="MIZORAM">MIZORAM</option>
+                        <option value="NAGALAND">NAGALAND</option>
+                        <option value="ODISHA">ODISHA</option>
+                        <option value="PUNJAB">PUNJAB</option>
+                        <option value="RAJASTHAN">RAJASTHAN</option>
+                        <option value="SIKKIM">SIKKIM</option>
+                        <option value="TAMIL NADU">TAMIL NADU</option>
+                        <option value="TRIPURA">TRIPURA</option>
+                        <option value="UTTAR PRADESH">UTTAR PRADESH</option>
+                        <option value="UTTARAKHAND">UTTARAKHAND</option>
+                        <option value="WEST BENGAL">WEST BENGAL</option>
+                        <option value="A & N ISLANDS">A & N ISLANDS</option>
+                        <option value="CHANDIGARH">CHANDIGARH</option>
+                        <option value="D & N HAVELI">D & N HAVELI</option>
+                        <option value="DAMAN & DIU">DAMAN & DIU</option>
+                        <option value="LAKSHADWEEP">LAKSHADWEEP</option>
+                        <option value="PUDUCHERRY">PUDUCHERRY</option>
+                    </select>
+                </div>
+
+                <div class="for-select m-0">
+                    <label for="crimeType"><i class="fas fa-crosshairs mr-1"></i> Crime Vector:</label>
+                    <select id="crimeType" name="crimeType" onchange="drawChart1()">
+                        <option value="MURDER">MURDER</option>
+                        <option value="ATTEMPT TO MURDER">ATTEMPT TO MURDER</option>
+                        <option value="RAPE">RAPE</option>
+                        <option value="KIDNAPPING & ABDUCTION">KIDNAPPING & ABDUCTION</option>
+                        <option value="DACOITY">DACOITY</option>
+                        <option value="ROBBERY">ROBBERY</option>
+                        <option value="THEFT">THEFT</option>
+                        <option value="HURT/GREVIOUS HURT">HURT/GREVIOUS HURT</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button class="button w-full" onclick="drawChart1()">
+                        <i class="fas fa-chart-column mr-2"></i> Bar Telemetry
+                    </button>
+                </div>
+
+                <div>
+                    <button class="button w-full" onclick="drawChart2()">
+                        <i class="fas fa-chart-line mr-2"></i> Trend Vector
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-    <button style="position:absolute; margin-top:150px; float:left; margin-left:50px;" class="button" onclick="drawChart1()">BAR CHART</button>
-    <button style="position:absolute; margin-top:230px; float:left; margin-left:50px;" class="button" onclick="drawChart2()">LINE CHART</button>
-    <div class="box" style="margin-left: 250px; overflow: hidden;">
-        <div id="chart_div" style="width: 100%; margin-top:20px; height: 95%"></div>
+
+        <!-- Chart Visualization Frame -->
+        <div class="box">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <span style="font-family: var(--font-cyber); font-size: 14px; letter-spacing: 2px; color: #ffffff;">
+                    <i class="fas fa-chart-area text-cyan-400 mr-2"></i> DECADAL INCIDENT DISTRIBUTION (2001-2012)
+                </span>
+                <span class="text-xs text-cyan-400 font-mono">SOURCE: NCRB HISTORICAL LOGS</span>
+            </div>
+            <div style="padding: 16px; min-height: 480px;">
+                <div id="chart_div" style="width: 100%; height: 450px;"></div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- Footer -->
     <footer>
-        <p> Copyright &copy; 2023. All rights reserved.</p>
-
+        <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
     </footer>
-</body>
 
+    <!-- Suspense FX Script -->
+    <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
+</body>
 
 </html>

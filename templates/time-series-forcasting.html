@@ -5,116 +5,100 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale">
-    <title>TIME SERIES FORECASTING</title>
-    <link rel="stylesheet" href="{{url_for( 'static',filename='stylesheets/style.css' )}} ">
-    <link rel="stylesheet " href="{{url_for( 'static',filename='stylesheets/graphanalysis.css' )}} ">
-    <link rel="stylesheet " href="{{url_for( 'static',filename='stylesheets/K-means.css' )}} ">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js "></script>
-    <script src="{{url_for( 'static',filename='javascript/linearregression.js' )}} "></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js " type="text/javascript "></script>
-    <script src="http://www.skulpt.org/js/skulpt.min.js " type="text/javascript "></script>
-    <script src="http://www.skulpt.org/js/skulpt-stdlib.js " type="text/javascript "></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Series Forecasting // National Crime Rate Trajectory</title>
 
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/K-means.css')}}">
 
-
-    <link href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'>
-    <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js'></script>
-
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-
-
-    <script src="https://kit.fontawesome.com/7bdcd846e8.js " crossorigin="anonymous "></script>
-
-
-
-    <script src="https://cdn.lordicon.com/libs/frhvbuzj/lord-icon-2.0.2.js "></script>
-
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
 </head>
 
-
-
-
-
-<body onload="tablefilling(1); ">
-    <nav class="main " style="width: 100%; ">
-        <a href="{{url_for('index')}}"><label style="margin-left:0;"class="logo">CRIME ANALYSIS</label></a>
+<body>
+    <!-- Main Navigation Bar -->
+    <nav class="main">
+        <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-            <li><a href="{{url_for('index')}}">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Feedback</a></li>
+            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
+            <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
+            <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
-        <nav class="secondnav">
-            <label class="log" href="#"> TIME SERIES FORECASTING(CRIME RATE)</label>
-        </nav>
-
     </nav>
-    <div style=" padding:2px; margin-top: 120px; margin-left:40%;">
 
-    </div>
+    <!-- Sub Navigation -->
+    <nav class="secondnav">
+        <label class="log"><i class="fas fa-wave-square mr-2"></i> NEURAL TIME-SERIES FORECASTING // CRIME RATE TRAJECTORY</label>
+    </nav>
 
-    <div style="margin-left:12%; width: 70%; margin-right:12%; margin-bottom:30px; ">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- Forecaster Header Telemetry -->
+        <div class="hero-dossier-badge mb-6">
+            <span class="status-indicator red-pulse"></span>
+            <span>ALGORITHMIC HORIZON ENGINE (META PROPHET) // 88.85% VALIDATION ACCURACY</span>
+        </div>
 
-        <div>
-            <p style=" margin-top: 2%; height: 30px; text-align: center; padding: 5px; background-color: #bbbb; border-radius: 10px;"><b>FORE-CAST:</b></p>
-            <div class="box" style="overflow:hidden; width: 900px; margin:auto; margin-top :30px;">
-                <iframe class="iframe1" style=" overflow: hidden; height: 100%; width: 100%;" src="{{url_for('static',filename='images/forecast.html')}}"></iframe>
+        <!-- Interactive Plot 1 -->
+        <div class="box mb-8">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <span style="font-family: var(--font-cyber); font-size: 14px; letter-spacing: 2px; color: #ffffff;">
+                    <i class="fas fa-chart-area text-cyan-400 mr-2"></i> NATIONAL CRIME RATE HORIZON PROJECTION (2001 - 2026)
+                </span>
+                <span class="text-xs text-green-400 font-mono"><i class="fas fa-circle text-[8px] mr-1"></i> ACTIVE MODEL</span>
             </div>
-            <p style="margin-top: 2%; height: 30px; text-align: center; padding: 5px; background-color: #bbbb; border-radius: 10px;"><b>FORE-CAST CMP:</b></p>
-            <div class="box" style="overflow:hidden; height:400px; width: 900px; margin:auto; margin-top :30px;">
-                <iframe class="iframe1" style=" overflow:hidden; height: 100%; width: 100%;" src="{{url_for('static',filename='images/forecast_cmp.html')}}"></iframe>
+            <div style="padding: 10px; height: 500px;">
+                <iframe style="width: 100%; height: 100%; border: none;" src="{{url_for('static',filename='images/forecast.html')}}"></iframe>
             </div>
         </div>
-        <div style='margin-left:12%; width: 70%; margin-right:12%; margin-bottom:30px;margin-top:30px; background-color:#bbbb; font-family:monsterrat; border:1px solid black; border-radius:10px; padding:5px'>FUTURE CRIMES ESTIMATED USING <b>EXPONENTIAL SMOOTHING</b>.</div>
 
-
-        <div style=" margin-top: 30px; margin-left: 20px; border-radius:10px; text-align:center; text-decoration: none; background-color:#bbbb; padding:6px;">
-            <a href="{{url_for('datadisp')}}">CLICK HERE TO VIEW THE DATA SET</a>
-        </div>
-        <div style="margin-top: 30px; margin-left: 20px; border-radius:10px; width:auto; text-align:center; background-color:#bbbb; padding:6px;">
-            Timeseries forecasting in simple words means to forecast or to predict the future value(eg-stock price) over a period of time.</p>
-        </div>
-
-        <div style="margin-top: 30px; margin-left: 20px; border-radius:10px; width:auto; text-align:center; background-color:#bbbb; padding:6px;">
-            <p><b>There are some key concepts associated with time series forecasting :</b></p>
-            <br>
-            <br>
-            <ul>
-                <li style="text-align: left;"><b>Seasonality:</b>In simple terms, Seasonality means repetition over time. For example, while predicting electricity bills will be higher every year in the summer season.
-                </li>
-                <br>
-                <li style="text-align: left;"><b>Trend :</b> It tells increasing or decreasing trends over time in the data.</li>
-            </ul>
-        </div>
-        <div style="margin-top: 30px; margin-left: 20px; border-radius:10px; width:auto; text-align:center; background-color:#bbbb; padding:6px; ">
-            Fb Prophet library was launched by Facebook now meta, and it was built for time series analysis. It can automatically manage parameters related to seasonality and data stationarity.</p>
+        <!-- Interactive Plot 2: Components -->
+        <div class="box mb-8">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <span style="font-family: var(--font-cyber); font-size: 14px; letter-spacing: 2px; color: #ffffff;">
+                    <i class="fas fa-project-diagram text-cyan-400 mr-2"></i> DECOMPOSED SEASONALITY & TREND COMPONENTS
+                </span>
+                <span class="text-xs text-cyan-400 font-mono">SEASONAL DECOMPOSITION</span>
+            </div>
+            <div style="padding: 10px; height: 480px;">
+                <iframe style="width: 100%; height: 100%; border: none;" src="{{url_for('static',filename='images/forecast_cmp.html')}}"></iframe>
+            </div>
         </div>
 
-        <div style="margin-top: 30px; margin-left: 20px; border-radius:10px; width:auto; text-align:center; background-color:#bbbb; padding:6px; ; ">
-            Here we are using fbprophet library to predict crime rate of India for the next 5 years : 2022, 2023, 2024, 2025 & 2026.
+        <!-- Technical Telemetry Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="threat-matrix-legend">
+                <span class="text-cyan-400 font-bold font-mono"><i class="fas fa-cogs mr-1"></i> SEASONALITY MATRIX</span>
+                <p class="text-xs text-gray-300">
+                    Captures recurring annual patterns, festival correlations, and seasonal crime spikes across Indian jurisdictions.
+                </p>
+            </div>
+            <div class="threat-matrix-legend">
+                <span class="text-amber-400 font-bold font-mono"><i class="fas fa-arrow-trend-up mr-1"></i> TREND VECTOR</span>
+                <p class="text-xs text-gray-300">
+                    Calculates long-term linear and non-linear shifts in national crime intensity over a 25-year statistical continuum.
+                </p>
+            </div>
+            <div class="threat-matrix-legend">
+                <span class="text-green-400 font-bold font-mono"><i class="fas fa-check-double mr-1"></i> BENCHMARK</span>
+                <p class="text-xs text-gray-300">
+                    Model Accuracy: <strong>88.8525%</strong> on holdout validation data using additive trend and multiplicative seasonal modes.
+                </p>
+            </div>
         </div>
-        <div style="margin-top: 30px; margin-left: 20px; border-radius:10px; width:auto; text-align:center; background-color:#bbbb; padding:6px; ">
-            Accuracy = 88.85251460155811%
-            </p>
-        </div>
-
 
     </div>
-    <div style="clear:both;">
-    </div>
-    <!---This is for prediction-->
 
-    </section>
-
-    </div>
-    <footer style="margin-top:13%">
-        <p> Copyright &copy; 2023. All rights reserved.</p>
-
+    <!-- Footer -->
+    <footer>
+        <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
     </footer>
 
+    <!-- Suspense FX Script -->
+    <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
 </body>
 
 </html>

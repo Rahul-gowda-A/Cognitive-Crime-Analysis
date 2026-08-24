@@ -125,8 +125,7 @@ function populatestates(stateElementId) {
 function Addyears(yearelement) {
     var yearElement = document.getElementById(yearelement);
     for (var i = 0; i < year_arr.length; i++) {
-        yearElement.options[yearElement.length] = new Option(year_arr[i], yearElement[year_arr]);
-
+        yearElement.options[yearElement.length] = new Option(year_arr[i], year_arr[i]);
     }
 }
 

@@ -6,10 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis2(2014-2021)</title>
+    <title>Geospatial Choropleth Density Radar // State-Wise Intelligence</title>
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/K-means.css')}}">
+    <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
 
 </head>
 <style>
@@ -203,71 +204,88 @@
 </style>
 
 <body>
+    <!-- Main Navigation Bar -->
     <nav class="main">
-        <a href="{{url_for('index')}}"><label style="margin-left:0;"class="logo">CRIME ANALYSIS</label></a>
+        <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-            <li><a href="{{url_for('index')}}">Home</a>
-            </li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Feedback</a></li>
+            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
+            <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
+            <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
-
-        <nav class="secondnav">
-            <label class="log"> CHOROPLETH</label>
-        </nav>
     </nav>
 
-    <div style="margin-left:40px; margin-top:130px;" class="state_input">
-        <div style="margin-left:180px">
-            <label style="margin-left:0px">Year:</label>
-            <select id="year_input" name="state_input">
-        <option value="disabled selected">Select Year</option>
-        <Option> 2014</Option>
-        <Option> 2015</Option>
-        <Option> 2016</Option>
-        <Option> 2017</Option>
-        <Option> 2018</Option>
-        <Option> 2019</Option>
-        <Option> 2020</Option>
-        <Option> 2021</Option>
+    <!-- Sub Navigation -->
+    <nav class="secondnav">
+        <label class="log"><i class="fas fa-globe-asia mr-2"></i> GEOSPATIAL CHOROPLETH RADAR // STATE-WISE INCIDENT DENSITY</label>
+    </nav>
 
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
         
-    </select>
-            <div class="state-input">
-                <label> Crime:</label>
-                <select id="crime_input" name="crime_input">
-    <Option value="disabled selected">Select Crime</Option>
-    <Option>Corruption</Option>
-    <Option>Crimes Against Children</Option>
-    <Option>Crimes Against Senior Citizen</Option>
-    <Option>Crimes Against Women</Option>
-    <Option>Cyber Crime</Option>
-    <Option>Kidnapping</Option>
-    <Option>Murders</Option>
-    <Option>Total Crimes</Option>
-</div>
+        <!-- Query Controls Strip -->
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-xl mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                <div class="for-select m-0">
+                    <label for="year_input"><i class="fas fa-calendar-alt mr-1"></i> Year:</label>
+                    <select id="year_input" name="year_input">
+                        <option disabled selected>Select Year</option>
+                        <option value="2014">2014</option>
+                        <option value="2015">2015</option>
+                        <option value="2016">2016</option>
+                        <option value="2017">2017</option>
+                        <option value="2018">2018</option>
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021" selected>2021</option>
+                    </select>
+                </div>
 
-    </select>
+                <div class="for-select m-0">
+                    <label for="crime_input"><i class="fas fa-crosshairs mr-1"></i> Crime Category:</label>
+                    <select id="crime_input" name="crime_input">
+                        <option disabled selected>Select Crime</option>
+                        <option value="Corruption">Corruption</option>
+                        <option value="Crimes Against Children">Crimes Against Children</option>
+                        <option value="Crimes Against Senior Citizen">Crimes Against Senior Citizen</option>
+                        <option value="Crimes Against Women">Crimes Against Women</option>
+                        <option value="Cyber Crime">Cyber Crime</option>
+                        <option value="Kidnapping">Kidnapping</option>
+                        <option value="Murders" selected>Murders</option>
+                        <option value="Total Crimes">Total Crimes</option>
+                    </select>
+                </div>
             </div>
-            <button class="button" style="margin-left:30px;" onclick="changeChoropleth('year_input','crime_input')">Submit</button>
 
-
+            <div>
+                <button class="button" onclick="changeChoropleth('year_input','crime_input')">
+                    <i class="fas fa-map-location-dot mr-2"></i> Render Choropleth
+                </button>
+            </div>
         </div>
 
-
-        <div class="box" style="margin-left:120px; overflow: hidden;">
-            <div class="tab-pane fade show active" id="v-pills-area-chart" role="tabpanel" aria-labelledby="v-pills-area-chart-tab">
-
-                <iframe style="margin-top: 2px; align-self: center; margin-bottom: 5px; border-radius: 25px;" src="plots/Choropleth/2021/2021_Murders.html" frameborder="0" width="1200" height="600" id="iframeID3"></iframe>
+        <!-- Geospatial Visualization Frame -->
+        <div class="box">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <span style="font-family: var(--font-cyber); font-size: 14px; letter-spacing: 2px; color: #ffffff;">
+                    <i class="fas fa-map text-cyan-400 mr-2"></i> ALL-INDIA CHOROPLETH DENSITY MAPPING
+                </span>
+                <span class="text-xs text-green-400 font-mono"><i class="fas fa-circle text-[8px] mr-1"></i> GEOPANDAS / CHOROPLETH</span>
+            </div>
+            <div style="padding: 10px; height: 600px;">
+                <iframe src="plots/Choropleth/2021/2021_Murders.html" frameborder="0" style="width: 100%; height: 100%; border: none; border-radius: 8px;" id="iframeID3"></iframe>
             </div>
         </div>
 
+    </div>
 
-        <footer>
-            <p> Copyright &copy; 2023. All rights reserved.</p>
+    <!-- Footer -->
+    <footer>
+        <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
+    </footer>
 
-        </footer>
+    <!-- Suspense FX Script -->
+    <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
 </body>
 
 </html>
