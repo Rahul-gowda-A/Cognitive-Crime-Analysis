@@ -1,9 +1,32 @@
 import io
 import sys
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from PyPDF2 import PdfReader
 from app import app, db, User
 from routes import extract_case_intelligence
+
+def generate_mock_pdf_bytes():
+    stream_content = (
+        b"BT /F1 12 Tf 50 750 Td (CRIME REPORT DOSSIER // RESTRICTED) Tj "
+        b"0 -30 Td (Date: 12/07/2026, Location: Shivaji Nagar, Pune.) Tj "
+        b"0 -30 Td (Police seized 5 kg contraband narcotics smack and an illegal revolver with 10 cartridges.) Tj "
+        b"0 -30 Td (Suspect arrested under NDPS Act and Arms Act.) Tj ET"
+    )
+    stream_len = len(stream_content)
+    return (
+        b"%PDF-1.4\n"
+        b"1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n"
+        b"2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n"
+        b"3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >> endobj\n"
+        b"4 0 obj << /Length " + str(stream_len).encode('ascii') + b" >>\nstream\n" + stream_content + b"\nendstream\nendobj\n"
+        b"5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj\n"
+        b"xref\n0 6\n0000000000 65535 f \n"
+        b"0000000009 00000 n \n"
+        b"0000000058 00000 n \n"
+        b"0000000115 00000 n \n"
+        b"0000000244 00000 n \n"
+        b"0000000320 00000 n \n"
+        b"trailer << /Size 6 /Root 1 0 R >>\nstartxref\n387\n%%EOF\n"
+    )
 
 def run_tests():
     print("==================================================")
@@ -40,15 +63,7 @@ def run_tests():
     print(f"[PASS] Test 2: Cyber Fraud correctly classified as {res2['severity_label']} with Threat Score {res2['threat_score']}.")
 
     # TEST 3: PDF Ingestion Simulation
-    pdf_buffer = io.BytesIO()
-    p = canvas.Canvas(pdf_buffer, pagesize=letter)
-    p.drawString(100, 750, "CRIME REPORT DOSSIER // RESTRICTED")
-    p.drawString(100, 720, "Date: 12/07/2026, Location: Shivaji Nagar, Pune.")
-    p.drawString(100, 690, "Police seized 5 kg contraband narcotics smack and an illegal revolver with 10 cartridges.")
-    p.drawString(100, 660, "Suspect arrested under NDPS Act and Arms Act.")
-    p.showPage()
-    p.save()
-    pdf_buffer.seek(0)
+    pdf_buffer = io.BytesIO(generate_mock_pdf_bytes())
 
     from PyPDF2 import PdfReader
     reader = PdfReader(pdf_buffer)
@@ -79,7 +94,7 @@ def run_tests():
         
         resp_officer_get = client.get('/analyze_case')
         assert resp_officer_get.status_code == 200, f"Expected 200 for field_officer GET, got {resp_officer_get.status_code}"
-        assert b'Case Narrative Intelligence Engine' in resp_officer_get.data
+        assert b'FIR Threat Assessment HUD' in resp_officer_get.data
         print("[PASS] Test 4c: Field Officer GET /analyze_case returned 200 OK with UI template.")
 
         # 4d. Field Officer POST /analyze_case with form narrative

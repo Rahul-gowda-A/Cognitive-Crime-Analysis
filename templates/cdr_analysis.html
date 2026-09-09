@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Detail Record (CDR) Intelligence Module // Spatial Proximity & Link Analysis</title>
+    <meta name="description" content="Call Detail Record (CDR) Intelligence Module — analyse cell-tower movements, crime-scene proximity leads, and contact frequency matrices.">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/graphanalysis.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/K-means.css') }}">
+
+    <!-- Leaflet.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
+
+    <!-- Theme initialization -->
+    <script>
+        (function() {
+            const saved = localStorage.getItem('app-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+
+    <style>
+        .cdr-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.25s ease;
+        }
+        .section-header {
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-primary);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-glass);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+        .cdr-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+        .file-drop-zone {
+            border: 2px dashed var(--border-input);
+            border-radius: 10px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+            position: relative;
+            background: var(--bg-input);
+        }
+        .file-drop-zone:hover, .file-drop-zone.drag-over {
+            border-color: var(--accent-primary);
+            background: rgba(56, 189, 248, 0.06);
+        }
+        .file-drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .file-drop-icon { font-size: 2rem; color: var(--accent-primary); margin-bottom: 0.5rem; }
+        #fileNameDisplay { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-emerald); margin-top: 0.4rem; min-height: 1.2em; font-weight: 600; }
+
+        /* Map */
+        #cdrMap {
+            height: 480px;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            background: var(--bg-dark);
+            width: 100%;
+        }
+        [data-theme="dark"] #cdrMap .leaflet-tile-pane {
+            filter: var(--map-tile-filter);
+        }
+
+        /* Tables & Lists */
+        .cdr-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .cdr-table th {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--border-glass);
+            text-align: left;
+        }
+        .cdr-table td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+        }
+        .cdr-table tr:hover td { background: rgba(56, 189, 248, 0.06); }
+
+        /* Badges */
+        .badge-lead { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 6px; padding: 0.2rem 0.55rem; font-weight: 700; font-size: 0.72rem; }
+        [data-theme="dark"] .badge-lead { color: #fbbf24; }
+        .badge-outgoing { background: rgba(56, 189, 248, 0.15); color: #0284c7; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 0.2rem 0.55rem; font-weight: 700; font-size: 0.72rem; }
+        [data-theme="dark"] .badge-outgoing { color: #38bdf8; }
+        .badge-incoming { background: rgba(129, 140, 248, 0.15); color: #4f46e5; border: 1px solid rgba(129, 140, 248, 0.4); border-radius: 6px; padding: 0.2rem 0.55rem; font-weight: 700; font-size: 0.72rem; }
+        [data-theme="dark"] .badge-incoming { color: #a5b4fc; }
+
+        /* Contact Bars */
+        .contact-bar-wrap { margin-bottom: 0.85rem; }
+        .contact-bar-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem; font-family: var(--font-mono); }
+        .contact-bar { height: 10px; border-radius: 5px; background: rgba(0,0,0,0.08); overflow: hidden; }
+        [data-theme="dark"] .contact-bar { background: rgba(255,255,255,0.08); }
+        .contact-bar-fill { height: 100%; border-radius: 5px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+
+        /* Timeline Items */
+        .timeline-entry {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.85rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-glass);
+            font-size: 0.82rem;
+        }
+        .timeline-step {
+            min-width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        /* Stats Strip */
+        .stat-strip { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .stat-box {
+            flex: 1;
+            min-width: 130px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary); line-height: 1; font-family: var(--font-heading); }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-top: 0.4rem; font-family: var(--font-mono); }
+
+        /* Loader */
+        #cdrLoader {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(5px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        #cdrLoader.active { display: flex; }
+        .spinner-ring {
+            width: 56px; height: 56px;
+            border: 4px solid rgba(56, 189, 248, 0.2);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .cdr-alert {
+            padding: 0.85rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+        .cdr-alert-warn { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); color: var(--accent-amber); }
+        .cdr-alert-error { background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.35); color: var(--accent-coral); }
+        .cdr-alert-success { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: var(--accent-emerald); }
+
+        .map-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.85rem; font-family: var(--font-mono); }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 0.4rem; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+<!-- Loader Overlay -->
+<div id="cdrLoader">
+    <div class="spinner-ring"></div>
+    <span style="font-family:var(--font-mono);font-size:0.85rem;color:#ffffff;letter-spacing:1px;">PROCESSING CDR TELECOM RECORDS…</span>
+</div>
+
+<!-- Main Frosted Navigation Bar -->
+<nav class="main">
+    <label class="logo" onclick="window.location.href='{{ url_for('index') }}'">CRIME INTELLIGENCE UNIT</label>
+    <ul>
+        <li><a href="{{ url_for('index') }}"><i class="fas fa-radar"></i> Home</a></li>
+        <li><a href="{{ url_for('about') }}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
+        {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+        <li><a href="{{ url_for('crimefeed') }}"><i class="fas fa-satellite-dish"></i> Spatial Heatmap HUD</a></li>
+        <li><a href="{{ url_for('analyze_case') }}"><i class="fas fa-microchip"></i> FIR Threat Assessment HUD</a></li>
+        <li><a href="{{ url_for('cdr_page') }}" class="active"><i class="fas fa-phone-volume"></i> CDR Intelligence</a></li>
+        <li><a href="{{ url_for('datadisp') }}"><i class="fas fa-database"></i> Datasets</a></li>
+        {% endif %}
+        <li><a href="{{ url_for('feedback') }}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
+    </ul>
+
+    <!-- Theme Switcher & Auth Controls -->
+    <div class="nav-auth" style="display:flex;align-items:center;gap:0.6rem;margin-left:auto;flex-shrink:0;">
+        <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Theme">
+            <i class="fas fa-moon theme-icon"></i>
+            <span class="theme-text">Dark Mode</span>
+        </button>
+
+        {% if current_user.is_authenticated %}
+            <span class="nav-role-badge" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.25rem 0.65rem;border-radius:999px;font-size:0.7rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;background:rgba(56,189,248,0.18);border:1px solid rgba(56,189,248,0.45);color:var(--accent-primary);white-space:nowrap;">
+                ● {{ current_user.role | upper }}
+            </span>
+            <a href="{{ url_for('logout') }}" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.78rem;font-weight:600;text-decoration:none;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.4);color:var(--accent-coral);">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        {% else %}
+            <a href="{{ url_for('login') }}" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.78rem;font-weight:600;text-decoration:none;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.45);color:var(--accent-primary);">
+                <i class="fas fa-lock"></i> Login
+            </a>
+        {% endif %}
+    </div>
+</nav>
+
+<!-- Secondary Navigation Banner -->
+<nav class="secondnav">
+    <label class="log"><i class="fas fa-phone-volume mr-2" style="color:var(--accent-primary)"></i> CALL DETAIL RECORD (CDR) INTELLIGENCE MODULE // SPATIAL PROXIMITY & LINK ANALYSIS</label>
+</nav>
+
+<!-- Main Container -->
+<div style="max-width:1400px;margin:0 auto;padding:2rem 1.5rem;">
+
+    <div id="alertBox"></div>
+
+    <div class="row g-4">
+
+        <!-- Left Column: Input Form -->
+        <div class="col-lg-4">
+            <form id="cdrForm" enctype="multipart/form-data">
+                
+                <!-- Card 1: CSV Upload -->
+                <div class="cdr-card">
+                    <div class="section-header">
+                        <i class="fas fa-file-csv mr-2"></i> TELECOM CSV DATASET UPLOAD
+                    </div>
+                    <div class="file-drop-zone" id="dropZone">
+                        <input type="file" name="cdr_file" id="cdrFileInput" accept=".csv" required>
+                        <div class="file-drop-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                        <div style="font-size:0.86rem;color:var(--text-primary);font-weight:600;">Drag & Drop CDR CSV or Browse</div>
+                        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.35rem;">
+                            Expected Columns: Caller_Number, Receiver_Number, DateTime, Call_Duration_Sec, Cell_Tower_ID, Tower_Lat, Tower_Lon
+                        </div>
+                        <div id="fileNameDisplay"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Parameters -->
+                <div class="cdr-card">
+                    <div class="section-header">
+                        <i class="fas fa-crosshairs mr-2"></i> TARGET & CRIME SCENE COORDINATES
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="cdr-label" for="targetNumber"><i class="fas fa-phone mr-1" style="color:var(--accent-primary)"></i> Target Phone Number</label>
+                        <input type="text" class="cdr-input w-100" id="targetNumber" name="target_number" value="9876543210" placeholder="e.g. 9876543210" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="cdr-label" for="crimeLat"><i class="fas fa-map-pin mr-1" style="color:var(--accent-coral)"></i> Crime Scene Latitude</label>
+                        <input type="number" class="cdr-input w-100" id="crimeLat" name="crime_lat" step="any" value="12.9716" placeholder="e.g. 12.9716" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="cdr-label" for="crimeLon"><i class="fas fa-map-pin mr-1" style="color:var(--accent-coral)"></i> Crime Scene Longitude</label>
+                        <input type="number" class="cdr-input w-100" id="crimeLon" name="crime_lon" step="any" value="77.5946" placeholder="e.g. 77.5946" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="cdr-label mb-0" for="radiusKm"><i class="fas fa-circle-notch mr-1" style="color:var(--accent-amber)"></i> Proximity Geofence Radius</label>
+                            <span class="badge-lead" id="radiusLabel">0.5 km</span>
+                        </div>
+                        <input type="range" class="form-range" id="radiusKm" name="radius_km" min="0.1" max="5.0" step="0.1" value="0.5"
+                               style="accent-color:var(--accent-primary);"
+                               oninput="document.getElementById('radiusLabel').textContent=this.value+' km'">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="button w-100" id="analyzeBtn">
+                            <i class="fas fa-satellite-dish mr-2"></i> Execute CDR Intelligence
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Column: Interactive Visuals & Results -->
+        <div class="col-lg-8">
+
+            <!-- Stats Strip -->
+            <div class="stat-strip" id="statsStrip" style="display:none!important">
+                <div class="stat-box">
+                    <div class="stat-value" id="statTimeline">—</div>
+                    <div class="stat-label">Target Trajectory Hits</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statProximity" style="color:var(--accent-coral)">—</div>
+                    <div class="stat-label">Proximity Leads (&le; 0.5km)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statContacts" style="color:var(--accent-amber)">—</div>
+                    <div class="stat-label">Top Associates</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statRadius" style="color:var(--accent-emerald)">—</div>
+                    <div class="stat-label">Radius (km)</div>
+                </div>
+            </div>
+
+            <!-- Leaflet Map Container -->
+            <div class="cdr-card">
+                <div class="section-header">
+                    <i class="fas fa-map-location-dot mr-2"></i> SPATIAL PROXIMITY & TRAJECTORY MAPPING
+                </div>
+                <div id="cdrMap"></div>
+                <div class="map-legend" id="mapLegend" style="display:none">
+                    <span><span class="legend-dot" style="background:#f43f5e"></span>Crime Scene (Center)</span>
+                    <span><span class="legend-dot" style="background:#38bdf8"></span>Target Historical Tower Path (Polyline)</span>
+                    <span><span class="legend-dot" style="background:#f59e0b"></span>Flagged Proximity Lead (Suspicious Calls)</span>
+                </div>
+            </div>
+
+            <!-- Proximity Leads Table -->
+            <div class="cdr-card" id="proximityCard" style="display:none">
+                <div class="section-header">
+                    <i class="fas fa-triangle-exclamation mr-2" style="color:var(--accent-amber)"></i> FLAGGED PROXIMITY LEADS (CALLS WITHIN CRIME SCENE GEOFENCE)
+                </div>
+                <div id="proximityContent"></div>
+            </div>
+
+            <!-- Top Contacts Frequency Matrix -->
+            <div class="cdr-card" id="contactsCard" style="display:none">
+                <div class="section-header">
+                    <i class="fas fa-network-wired mr-2" style="color:var(--accent-primary)"></i> TOP-5 MOST FREQUENT CONTACTS MATRIX
+                </div>
+                <div id="contactsContent"></div>
+            </div>
+
+            <!-- Historical Movement Timeline -->
+            <div class="cdr-card" id="timelineCard" style="display:none">
+                <div class="section-header">
+                    <i class="fas fa-clock-rotate-left mr-2"></i> TARGET CHRONOLOGICAL MOVEMENT TRAJECTORY
+                </div>
+                <div id="timelineContent" style="max-height:380px;overflow-y:auto;padding-right:0.5rem;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>CRIME INTELLIGENCE &amp; THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
+</footer>
+
+<!-- Scripts -->
+<script src="{{ url_for('static', filename='javascript/theme.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/cdr_dashboard.js') }}"></script>
+
+{% if result %}
+<script>
+    (function(){
+        try {
+            const data = {{ result | safe }};
+            if (data && data.status === 'success') {
+                window.__CDR_PRELOAD__ = data;
+            }
+        } catch(e) {}
+    })();
+</script>
+{% endif %}
+
+</body>
+</html>

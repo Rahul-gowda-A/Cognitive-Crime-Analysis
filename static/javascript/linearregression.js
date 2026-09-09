@@ -178,9 +178,9 @@ function changecolor() {
 
 function labelchanges() {
     const label = document.getElementById("prediction-input");
-    let text = label.textContent;
+    let text = label.textContent.trim();
     console.log(text);
-    text = text.split(',').join('<br><br>');
+    text = text.split(' | ').join('<br><br>');
     console.log(text);
     label.innerHTML = text;
 }

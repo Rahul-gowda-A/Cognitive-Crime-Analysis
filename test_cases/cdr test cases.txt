@@ -1,0 +1,27 @@
+File to Upload: cdr_case1_bengaluru_robbery.csv
+Target Phone Number: 9876543210
+Crime Scene Latitude: 12.9716
+Crime Scene Longitude: 77.5946
+Proximity Radius: 0.5 km
+Key Findings: Identifies midnight call bursts near MG Road / Brigade Road towers with suspect's top accomplice (9845012345).
+📍 Case 2: Narcotics Transit Ring (Mumbai)
+File to Upload: cdr_case2_mumbai_narcotics.csv
+Target Phone Number: 9820011223
+Crime Scene Latitude: 19.0596
+Crime Scene Longitude: 72.8295
+Proximity Radius: 0.8 km
+Key Findings: Tracks suspect's movements across Bandra West / Carter Road and frequent contact matrix with distributor (9920199888).
+📍 Case 3: Cyber Extortion Syndicate (New Delhi)
+File to Upload: cdr_case3_delhi_cyber_fraud.csv
+Target Phone Number: 9811099887
+Crime Scene Latitude: 28.6289
+Crime Scene Longitude: 77.2065
+Proximity Radius: 0.6 km
+Key Findings: Highlights afternoon call clusters near Connaught Place & Janpath with chief operator (9810011223).
+📍 Case 4: Night Burglary Corridor (Hyderabad)
+File to Upload: cdr_case4_hyderabad_burglary.csv
+Target Phone Number: 9849055443
+Crime Scene Latitude: 17.4483
+Crime Scene Longitude: 78.3915
+Proximity Radius: 0.5 km
+Key Findings: Traces getaway path through Hitec City / Madhapur corridor towers around 03:00 AM.

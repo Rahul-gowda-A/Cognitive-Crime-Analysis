@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case Intelligence Analyzer // Field Officer Tactical Dossier</title>
+    <title>FIR Threat Assessment HUD // VADER NLP + RegEx Weighted IPC Severity Scoring</title>
 
     <!-- Google Fonts & Tailwind -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,6 +18,13 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
+
+    <script>
+        (function() {
+            const saved = localStorage.getItem('app-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
 
     <style>
         :root {
@@ -230,8 +237,9 @@
             <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
             <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
             {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
-            <li><a href="{{url_for('analyze_case')}}" class="active" style="color:#06b6d4;font-weight:700;"><i class="fas fa-microchip"></i> Case Analyzer</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Spatial Heatmap HUD</a></li>
+            <li><a href="{{url_for('analyze_case')}}" class="active" style="color:#06b6d4;font-weight:700;"><i class="fas fa-microchip"></i> FIR Threat Assessment HUD</a></li>
+            <li><a href="{{url_for('cdr_page')}}"><i class="fas fa-phone-volume"></i> CDR Intelligence</a></li>
             <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
             {% endif %}
             <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
@@ -239,6 +247,11 @@
 
         <!-- Auth Controls -->
         <div class="nav-auth" style="display:flex;align-items:center;gap:0.6rem;margin-left:auto;padding-right:0.5rem;flex-shrink:0;">
+            <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Theme">
+                <i class="fas fa-moon theme-icon"></i>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+
             {% if current_user.is_authenticated %}
                 <span class="nav-role-badge" style="
                     display:inline-flex;align-items:center;gap:0.35rem;
@@ -272,7 +285,7 @@
 
     <!-- Sub Navigation -->
     <nav class="secondnav">
-        <label class="log"><i class="fas fa-microchip mr-2"></i> CASE FILE INTELLIGENCE ANALYZER // NLP THREAT MATRIX & ENTITY EXTRACTION</label>
+        <label class="log"><i class="fas fa-microchip mr-2"></i> FIR THREAT ASSESSMENT HUD // VADER NLP + REGEX WEIGHTED IPC SEVERITY SCORING</label>
     </nav>
 
     <!-- Main Content Container -->
@@ -301,18 +314,23 @@
                 <i class="fas fa-shield-halved text-8xl text-purple-400"></i>
             </div>
 
-            <div class="hero-dossier-badge mb-4">
-                <span class="status-indicator red-pulse"></span>
-                <span>RESTRICTED FIELD DOSSIER // CASE FILE INGESTION & THREAT AUDIT</span>
+            <div class="flex items-center gap-2 mb-4 flex-wrap">
+                <span class="algorithm-badge algorithm-badge-nlp">
+                    <i class="fas fa-shield-virus mr-1"></i> VADER NLP + RegEx Weighted IPC Severity Scoring
+                </span>
+                <div class="hero-dossier-badge m-0">
+                    <span class="status-indicator red-pulse"></span>
+                    <span>RESTRICTED FIELD DOSSIER // FIR THREAT ASSESSMENT HUD</span>
+                </div>
             </div>
 
             <h1 class="text-2xl md:text-3xl font-extrabold text-white mb-2 tracking-tight font-display">
-                <i class="fas fa-brain text-cyan-400 mr-2"></i> Case Narrative Intelligence Engine
+                <i class="fas fa-microchip text-cyan-400 mr-2"></i> FIR Threat Assessment HUD
             </h1>
             <p class="text-sm text-gray-300 mb-6 max-w-3xl font-sans leading-relaxed">
                 Upload First Information Reports (FIR), witness interrogation transcripts, or intelligence memos. 
-                The system extracts forensic timeline markers, weapon signatures, crime classifications (IPC / NDPS / Arms Act), 
-                and evaluates sentiment severity in real-time.
+                The system extracts forensic timeline markers, weapon signatures, statutory crime classifications (IPC / NDPS / Arms Act), 
+                and evaluates real-time threat severity via VADER Sentiment NLP + RegEx weighted scoring.
             </p>
 
             <form action="{{ url_for('analyze_case') }}" method="POST" enctype="multipart/form-data" id="caseForm">
@@ -381,9 +399,16 @@
                     <div class="text-xs text-gray-400 font-tactical">
                         <i class="fas fa-user-shield text-cyan-400 mr-1"></i> Officer Clearance: <span class="text-white font-bold">{{ current_user.username }}</span> (Field Officer)
                     </div>
-                    <button type="submit" class="button" style="min-width: 240px; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.03em;">
+                    <button type="submit" id="fir-submit-btn" class="button" style="min-width: 240px; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.03em;" onclick="showFirLoader()">
                         <i class="fas fa-radar mr-2"></i> Initiate Intelligence Scan
                     </button>
+                </div>
+
+                <!-- Loading overlay -->
+                <div id="fir-loader" style="display:none;position:fixed;inset:0;background:rgba(3,7,18,0.82);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:1rem;">
+                    <div style="width:56px;height:56px;border:4px solid rgba(6,182,212,0.2);border-top-color:#06b6d4;border-radius:50%;animation:_fir_spin .8s linear infinite;"></div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#06b6d4;letter-spacing:2px;">PROCESSING NARRATIVE…</span>
+                    <style>@keyframes _fir_spin{to{transform:rotate(360deg)}}</style>
                 </div>
             </form>
         </div>
@@ -391,6 +416,13 @@
 
         <!-- Intelligence Analysis Results Section (Rendered when results exist) -->
         {% if result %}
+        <!-- Toast notification -->
+        <div id="fir-toast" style="position:fixed;top:80px;right:1.5rem;z-index:9000;background:linear-gradient(135deg,#064e3b,#065f46);border:1px solid #10b981;border-radius:10px;padding:.75rem 1.25rem;color:#a7f3d0;font-family:'JetBrains Mono',monospace;font-size:.78rem;box-shadow:0 8px 24px rgba(0,0,0,.5);display:flex;align-items:center;gap:.65rem;animation:_fir_slideIn .4s ease;">
+            <i class="fas fa-check-circle" style="color:#34d399;font-size:1rem;"></i>
+            Intelligence Analysis Complete &mdash; <strong style="color:#6ee7b7;">{{ result.severity_label }}</strong>
+            <button onclick="document.getElementById('fir-toast').remove()" style="margin-left:.5rem;background:none;border:none;color:#6ee7b7;cursor:pointer;font-size:1rem;line-height:1;">&times;</button>
+        </div>
+        <style>@keyframes _fir_slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}</style>
         <div id="results-dossier" class="space-y-8 animate-fade-in">
             
             <!-- SECTION 1: Threat Severity Banner & Sentiment Polarity -->
@@ -726,6 +758,33 @@
 
     <!-- Client Script for Dropzone, Sample Ingestion & Copying -->
     <script>
+        // Show loader on form submit
+        function showFirLoader() {
+            const textarea = document.getElementById('case_text');
+            const fileInput = document.getElementById('case_file');
+            const hasText = textarea && textarea.value.trim().length > 0;
+            const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+            if (hasText || hasFile) {
+                const loader = document.getElementById('fir-loader');
+                if (loader) { loader.style.display = 'flex'; }
+            }
+        }
+
+        // Auto-scroll to results when they exist on page load
+        window.addEventListener('DOMContentLoaded', function () {
+            const results = document.getElementById('results-dossier');
+            if (results) {
+                setTimeout(function () {
+                    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 350);
+                // Auto-dismiss toast after 5s
+                setTimeout(function () {
+                    const toast = document.getElementById('fir-toast');
+                    if (toast) { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s'; setTimeout(function(){ toast.remove(); }, 500); }
+                }, 5000);
+            }
+        });
+
         // Update character counter
         function updateCharCount(el) {
             const count = el.value.length;
@@ -834,6 +893,7 @@ MANDATORY FIELD SAFETY PROTOCOLS:
             {% endif %}
         }
     </script>
+    <script src="{{url_for('static',filename='javascript/theme.js')}}"></script>
 </body>
 
 </html>

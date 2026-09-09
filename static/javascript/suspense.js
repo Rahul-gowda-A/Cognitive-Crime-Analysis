@@ -209,14 +209,15 @@ function injectSuspenseStatusBar() {
     strip.id = 'tactical-status-strip';
     strip.className = 'tactical-status-strip';
 
-    const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const getLocalTimestamp = () => new Date().toLocaleString('sv-SE').replace('T', ' ');
+    const timestamp = getLocalTimestamp();
     const isMuted = SuspenseFX.muted;
 
     strip.innerHTML = `
         <div class="status-left">
             <span class="status-indicator red-pulse"></span>
             <span class="status-tag">RESTRICTED DOSSIER // CRIME ANALYSIS INTELLIGENCE</span>
-            <span class="status-coord hidden-mobile">SYS.VER: 4.8.2 // UTC: <span id="tactical-clock">${timestamp}</span></span>
+            <span class="status-coord hidden-mobile">SYS.VER: 4.8.2 // LOCAL: <span id="tactical-clock">${timestamp}</span></span>
         </div>
         <div class="status-right">
             <span class="threat-badge"><span class="radar-blip"></span> SURVEILLANCE RADAR: ARMED</span>
@@ -251,7 +252,7 @@ function injectSuspenseStatusBar() {
     setInterval(() => {
         const clock = document.getElementById('tactical-clock');
         if (clock) {
-            clock.textContent = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            clock.textContent = getLocalTimestamp();
         }
     }, 1000);
 }

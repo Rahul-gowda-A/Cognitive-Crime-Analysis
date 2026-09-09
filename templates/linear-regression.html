@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linear Regression // IPC Crime Volume Prediction</title>
+    <title>Demographic Trend Analytics // Ordinary Least Squares Linear Regression</title>
 
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/style.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
@@ -16,6 +16,13 @@
     <script src="{{url_for('static',filename='javascript/linearregression.js')}}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
+
+    <script>
+        (function() {
+            const saved = localStorage.getItem('app-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
 </head>
 
 <body>
@@ -26,17 +33,39 @@
             <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
             <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
             {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
-            <li><a href="{{url_for('analyze_case')}}"><i class="fas fa-microchip"></i> Case Analyzer</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Spatial Heatmap HUD</a></li>
+            <li><a href="{{url_for('analyze_case')}}"><i class="fas fa-microchip"></i> FIR Threat Assessment HUD</a></li>
+            <li><a href="{{url_for('cdr_page')}}"><i class="fas fa-phone-volume"></i> CDR Intelligence</a></li>
             <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
             {% endif %}
             <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
+
+        <div class="nav-auth" style="display:flex;align-items:center;gap:0.6rem;margin-left:auto;flex-shrink:0;">
+            <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Theme">
+                <i class="fas fa-moon theme-icon"></i>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+
+            {% if current_user.is_authenticated %}
+                <span class="nav-role-badge" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.25rem 0.65rem;border-radius:999px;font-size:0.7rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;background:rgba(56,189,248,0.18);border:1px solid rgba(56,189,248,0.45);color:var(--accent-primary);white-space:nowrap;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:var(--accent-primary);box-shadow:0 0 6px var(--accent-primary);flex-shrink:0;"></span>
+                    {{ current_user.role | upper }}
+                </span>
+                <a href="{{ url_for('logout') }}" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.78rem;font-weight:600;letter-spacing:0.03em;text-decoration:none;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.4);color:var(--accent-coral);transition:background 0.2s,border-color 0.2s,transform 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='rgba(244,63,94,0.12)';this.style.transform='translateY(0)';">
+                    <i class="fas fa-sign-out-alt" style="font-size:0.75rem;"></i> Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.78rem;font-weight:600;letter-spacing:0.03em;text-decoration:none;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.45);color:var(--accent-primary);transition:background 0.2s,border-color 0.2s,transform 0.15s;white-space:nowrap;">
+                    <i class="fas fa-lock" style="font-size:0.75rem;"></i> Login
+                </a>
+            {% endif %}
+        </div>
     </nav>
 
     <!-- Sub Navigation -->
     <nav class="secondnav">
-        <label class="log"><i class="fas fa-chart-line mr-2"></i> LINEAR REGRESSION // POPULATION vs IPC CRIME PROJECTION</label>
+        <label class="log"><i class="fas fa-chart-line mr-2"></i> DEMOGRAPHIC TREND ANALYTICS // ORDINARY LEAST SQUARES LINEAR REGRESSION</label>
     </nav>
 
     <div class="container mx-auto px-4 py-8 max-w-5xl">
@@ -45,10 +74,15 @@
             
             <!-- Query Form (2 Columns) -->
             <div class="md:col-span-2">
-                <form action="{{url_for('linearreg')}}" method="post">
-                    <div class="hero-dossier-badge mb-4">
-                        <span class="status-indicator red-pulse"></span>
-                        <span>DEMOGRAPHIC & CRIME REGRESSION MODEL</span>
+                <form action="{{url_for('LinearReg')}}" method="post">
+                    <div class="flex items-center gap-2 mb-4 flex-wrap">
+                        <span class="algorithm-badge algorithm-badge-ols">
+                            <i class="fas fa-chart-line mr-1"></i> Ordinary Least Squares Linear Regression
+                        </span>
+                        <div class="hero-dossier-badge m-0">
+                            <span class="status-indicator red-pulse"></span>
+                            <span>DEMOGRAPHIC TREND REGRESSION HUD</span>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -81,13 +115,37 @@
                         <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--accent-cyan); margin-bottom: 12px;">
                             STATISTICAL PROJECTION METRICS:
                         </div>
-                        <div id="prediction-input" style="font-family: var(--font-cyber); font-size: 18px; color: #ffffff; line-height: 1.8;">
-                            {{ prediction_text }}
-                        </div>
+
+                        {% if prediction_text.startswith('ERROR') or prediction_text.startswith('Please') %}
+                            <div style="color: #ff4d4f; font-size: 15px; font-weight: bold; padding: 14px; background: rgba(255, 77, 79, 0.12); border: 1px solid rgba(255, 77, 79, 0.4); border-radius: 8px;">
+                                <i class="fas fa-exclamation-triangle mr-2"></i> {{ prediction_text }}
+                            </div>
+                        {% else %}
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2 text-center">
+                                <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 shadow-md">
+                                    <span class="text-xs text-purple-400 font-mono block mb-1">PROJECTED IPC VOL:</span>
+                                    <strong style="font-size: 24px; color: #22d3ee; text-shadow: 0 0 10px rgba(34,211,238,0.3);">
+                                        {{ predicted_crimes | int if predicted_crimes else 'N/A' }}
+                                    </strong>
+                                </div>
+                                <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 shadow-md">
+                                    <span class="text-xs text-gray-400 font-mono block mb-1">PROJECTED POPULATION:</span>
+                                    <strong style="font-size: 20px; color: #ffffff;">
+                                        {{ estimated_population }} Lakhs
+                                    </strong>
+                                </div>
+                                <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 shadow-md">
+                                    <span class="text-xs text-amber-400 font-mono block mb-1">CRIME RATE (PER LAKH):</span>
+                                    <strong style="font-size: 20px; color: #f59e0b;">
+                                        {{ crime_rate }}
+                                    </strong>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 12px; font-size: 11px; color: #8b99b5; font-family: var(--font-mono);">
+                                TARGET STATE: <strong class="text-white">{{ selected_state }}</strong> &nbsp;|&nbsp; HORIZON YEAR: <strong class="text-yellow-400">{{ target_year }}</strong>
+                            </div>
+                        {% endif %}
                     </div>
-                    <script>
-                        labelchanges();
-                    </script>
                     {% endif %}
                 </form>
             </div>
@@ -120,7 +178,8 @@
         <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
     </footer>
 
-    <!-- Suspense FX Script -->
+    <!-- Scripts -->
+    <script src="{{url_for('static',filename='javascript/theme.js')}}"></script>
     <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
 </body>
 

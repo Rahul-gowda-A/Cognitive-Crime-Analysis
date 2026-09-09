@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -13,6 +13,14 @@
     <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/graphanalysis.css')}}">
     
     <script src="https://kit.fontawesome.com/7bdcd846e8.js" crossorigin="anonymous"></script>
+
+    <!-- Theme initialization -->
+    <script>
+        (function() {
+            const saved = localStorage.getItem('app-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
 </head>
 
 <body>
@@ -20,27 +28,33 @@
     <nav class="main">
         <label class="logo" onclick="window.location.href='{{url_for('index')}}'">CRIME INTELLIGENCE UNIT</label>
         <ul>
-            <li><a href="{{url_for('index')}}"><i class="fas fa-radar"></i> Home</a></li>
+            <li><a href="{{url_for('index')}}" class="active"><i class="fas fa-radar"></i> Home</a></li>
             <li><a href="{{url_for('about')}}"><i class="fas fa-shield-alt"></i> Dossier</a></li>
             {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Live Feed</a></li>
-            <li><a href="{{url_for('analyze_case')}}"><i class="fas fa-microchip"></i> Case Analyzer</a></li>
+            <li><a href="{{url_for('crimefeed')}}"><i class="fas fa-satellite-dish"></i> Spatial Heatmap HUD</a></li>
+            <li><a href="{{url_for('analyze_case')}}"><i class="fas fa-microchip"></i> FIR Threat Assessment HUD</a></li>
+            <li><a href="{{url_for('cdr_page')}}"><i class="fas fa-phone-volume"></i> CDR Intelligence</a></li>
             <li><a href="{{url_for('datadisp')}}"><i class="fas fa-database"></i> Datasets</a></li>
             {% endif %}
             <li><a href="{{url_for('feedback')}}"><i class="fas fa-comment-dots"></i> Feedback</a></li>
         </ul>
 
-        <!-- Auth Controls -->
-        <div class="nav-auth" style="display:flex;align-items:center;gap:0.6rem;margin-left:auto;padding-right:0.5rem;flex-shrink:0;">
+        <!-- Theme Switcher & Auth Controls -->
+        <div class="nav-auth" style="display:flex;align-items:center;gap:0.6rem;margin-left:auto;flex-shrink:0;">
+            <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Theme">
+                <i class="fas fa-moon theme-icon"></i>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+
             {% if current_user.is_authenticated %}
                 <span class="nav-role-badge" style="
                     display:inline-flex;align-items:center;gap:0.35rem;
                     padding:0.25rem 0.65rem;border-radius:999px;font-size:0.7rem;
                     font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
-                    background:rgba(139,92,246,0.18);border:1px solid rgba(139,92,246,0.45);
-                    color:#a78bfa;white-space:nowrap;">
-                    <span style="width:7px;height:7px;border-radius:50%;background:#a78bfa;
-                                 box-shadow:0 0 6px #a78bfa;flex-shrink:0;"></span>
+                    background:rgba(56,189,248,0.18);border:1px solid rgba(56,189,248,0.45);
+                    color:var(--accent-primary);white-space:nowrap;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:var(--accent-primary);
+                                 box-shadow:0 0 6px var(--accent-primary);flex-shrink:0;"></span>
                     {{ current_user.role | upper }}
                 </span>
 
@@ -48,11 +62,9 @@
                     display:inline-flex;align-items:center;gap:0.35rem;
                     padding:0.3rem 0.8rem;border-radius:8px;font-size:0.78rem;
                     font-weight:600;letter-spacing:0.03em;text-decoration:none;
-                    background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.4);
-                    color:#f87171;transition:background 0.2s,border-color 0.2s,transform 0.15s;
-                    white-space:nowrap;"
-                    onmouseover="this.style.background='rgba(248,113,113,0.22)';this.style.transform='translateY(-1px)';"
-                    onmouseout="this.style.background='rgba(248,113,113,0.12)';this.style.transform='translateY(0)';">
+                    background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.4);
+                    color:var(--accent-coral);transition:background 0.2s,border-color 0.2s,transform 0.15s;
+                    white-space:nowrap;">
                     <i class="fas fa-sign-out-alt" style="font-size:0.75rem;"></i> Logout
                 </a>
             {% else %}
@@ -60,11 +72,9 @@
                     display:inline-flex;align-items:center;gap:0.35rem;
                     padding:0.3rem 0.8rem;border-radius:8px;font-size:0.78rem;
                     font-weight:600;letter-spacing:0.03em;text-decoration:none;
-                    background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.45);
-                    color:#a78bfa;transition:background 0.2s,border-color 0.2s,transform 0.15s;
-                    white-space:nowrap;"
-                    onmouseover="this.style.background='rgba(139,92,246,0.28)';this.style.transform='translateY(-1px)';"
-                    onmouseout="this.style.background='rgba(139,92,246,0.15)';this.style.transform='translateY(0)';">
+                    background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.45);
+                    color:var(--accent-primary);transition:background 0.2s,border-color 0.2s,transform 0.15s;
+                    white-space:nowrap;">
                     <i class="fas fa-lock" style="font-size:0.75rem;"></i> Login
                 </a>
             {% endif %}
@@ -80,7 +90,7 @@
         </div>
         <h1 class="hero-title">CRIME PATTERN RECOGNITION & PREDICTIVE THREAT INTELLIGENCE</h1>
         <p class="hero-subtitle">
-            Advanced algorithmic district zoning, multi-vector IPC crime classification, neural time-series forecasting, and geospatial crime intensity tracking across India.
+            Advanced algorithmic district zoning, multi-vector IPC crime classification, neural time-series forecasting, call detail record geospatial proximity mapping, and real-time news radar across India.
         </p>
 
         <!-- Live Tactical Telemetry -->
@@ -105,7 +115,7 @@
     </section>
 
     {# =========================================================
-       Role-based access banner — shown only when logged in
+       Role-based access banner
        ========================================================= #}
     {% if current_user.is_authenticated %}
     <div class="role-access-banner" style="
@@ -130,211 +140,211 @@
     {% endif %}
 
     {# =========================================================
-       Classified Dossier Modules Grid
-       Permission matrix:
-         public         → Analytics, Geospatial
-         field_officer  → All 8 modules
+       Standardized Classified Dossier Modules Grid
        ========================================================= #}
     <section class="container px-5 py-6 mx-auto">
         <div class="flex flex-wrap -m-3">
 
-            {# --- Module 1: Clustering — field_officer only --- #}
-            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            {# --- Module 1: Spatial Risk Zoning HUD --- #}
+            {% if current_user.is_authenticated %}
             <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
+                <div class="hud-module-card">
+                    <span class="algorithm-badge algorithm-badge-kmeans">
+                        <i class="fas fa-project-diagram mr-1"></i> K-Means Clustering Algorithm
+                    </span>
                     <h2 class="title-font">
-                        <span><i class="fas fa-project-diagram text-cyan-400 mr-2"></i> Clustering</span>
+                        <span><i class="fas fa-crosshairs text-cyan-400 mr-2"></i> Spatial Risk Zoning HUD</span>
                     </h2>
                     <p class="leading-relaxed">
-                        Unsupervised partition of 700+ Indian districts into Red, Orange, and Green Crime Threat Zones based on historical multi-dimensional IPC metrics.
+                        Unsupervised multi-dimensional partitioning of 700+ Indian districts into Red, Orange, and Green Crime Threat Zones based on historical IPC crime metrics.
                     </p>
-                </div>
-                <div class="drop-down mt-auto">
-                    <button type="button" class="button">
-                        <span>Access Dossier</span>
-                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
-                    </button>
-                    <div class="dd-content">
-                        <a href="{{url_for('Kmeans')}}"><i class="fas fa-crosshairs mr-2"></i> K-Means Cluster Engine</a>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            {# --- Module 2: Classification — field_officer only --- #}
-            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
-                    <h2 class="title-font">
-                        <span><i class="fas fa-shield-virus text-red-500 mr-2"></i> Classification</span>
-                    </h2>
-                    <p class="leading-relaxed">
-                        Random Forest threat model evaluating future crime incidents via Exponential Smoothing to predict district risk classification.
-                    </p>
-                </div>
-                <div class="drop-down mt-auto">
-                    <button type="button" class="button">
-                        <span>Access Dossier</span>
-                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
-                    </button>
-                    <div class="dd-content">
-                        <a href="{{url_for('Randomfrstcls')}}"><i class="fas fa-brain mr-2"></i> Random Forest Classifier</a>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            {# --- Module 3: Regression — field_officer only --- #}
-            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
-                    <h2 class="title-font">
-                        <span><i class="fas fa-chart-line text-yellow-400 mr-2"></i> Regression</span>
-                    </h2>
-                    <p class="leading-relaxed">
-                        Geometric growth population projections coupled with trained regression models to calculate projected IPC crime volume and rate.
-                    </p>
-                </div>
-                <div class="mt-auto">
-                    <a href="{{url_for('LinearReg')}}" style="text-decoration:none; display:block;">
-                        <button type="button" class="button" style="width:100%;">
-                            <span>Initiate Scan</span>
-                            <i class="fas fa-arrow-right text-xs ml-2"></i>
+                    <div class="drop-down mt-auto">
+                        <button type="button" class="button">
+                            <span>Access Dossier</span>
+                            <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
                         </button>
-                    </a>
-                </div>
-            </div>
-            {% endif %}
-
-            {# --- Module 4: Time-Series Forecasting — field_officer only --- #}
-            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
-                    <h2 class="title-font">
-                        <span><i class="fas fa-wave-square text-cyan-300 mr-2"></i> Forecasting</span>
-                    </h2>
-                    <p class="leading-relaxed">
-                        Meta Prophet predictive neural horizon modeling seasonality and trends to forecast national crime trajectories up to 2027.
-                    </p>
-                </div>
-                <div class="drop-down mt-auto">
-                    <button type="button" class="button">
-                        <span>Access Dossier</span>
-                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
-                    </button>
-                    <div class="dd-content">
-                        <a href="{{url_for('timeseriescr')}}"><i class="fas fa-chart-area mr-2"></i> Crime Rate Forecast</a>
-                        <a href="{{url_for('timeseriesipc')}}"><i class="fas fa-chart-bar mr-2"></i> Total IPC Forecast</a>
+                        <div class="dd-content">
+                            <a href="{{url_for('Kmeans')}}"><i class="fas fa-crosshairs mr-2"></i> Spatial Risk Zoning HUD</a>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endif %}
 
-            {# --- Module 5: Visual Analytics — public & field_officer --- #}
+            {# --- Module 2: Multi-Category Predictive Risk Engine --- #}
+            {% if current_user.is_authenticated %}
             <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
+                <div class="hud-module-card">
+                    <span class="algorithm-badge algorithm-badge-rf">
+                        <i class="fas fa-brain mr-1"></i> Random Forest Classifier
+                    </span>
                     <h2 class="title-font">
-                        <span><i class="fas fa-chart-pie text-purple-400 mr-2"></i> Analytics</span>
+                        <span><i class="fas fa-shield-virus text-red-500 mr-2"></i> Multi-Category Predictive Risk Engine</span>
                     </h2>
                     <p class="leading-relaxed">
-                        Interactive Google Charts and Plotly multi-variable crime telemetry for cross-decade incident pattern inspection.
+                        Random Forest bagged ensemble evaluating future crime incidents via Exponential Smoothing to predict multi-category district risk designations.
                     </p>
-                </div>
-                <div class="drop-down mt-auto">
-                    <button type="button" class="button">
-                        <span>Access Dossier</span>
-                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
-                    </button>
-                    <div class="dd-content">
-                        <a href="{{url_for('analysis')}}"><i class="fas fa-chart-column mr-2"></i> Google Charts Telemetry</a>
-                        <a href="{{url_for('analysis2')}}"><i class="fas fa-chart-simple mr-2"></i> Plotly Multi-Linear Engine</a>
-                    </div>
-                </div>
-            </div>
-
-            {# --- Module 6: Geospatial — public & field_officer --- #}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
-                    <h2 class="title-font">
-                        <span><i class="fas fa-map-marked-alt text-green-400 mr-2"></i> Geospatial</span>
-                    </h2>
-                    <p class="leading-relaxed">
-                        Choropleth mapping of geographic density markers and territorial crime severity indicators across all states and union territories.
-                    </p>
-                </div>
-                <div class="drop-down mt-auto">
-                    <button type="button" class="button">
-                        <span>Access Dossier</span>
-                        <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
-                    </button>
-                    <div class="dd-content">
-                        <a href="{{url_for('analysis3')}}"><i class="fas fa-globe-asia mr-2"></i> State Choropleth Radar</a>
-                    </div>
-                </div>
-            </div>
-
-            {# --- Module 7: Live Crime Feed — field_officer only --- #}
-            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
-                    <h2 class="title-font">
-                        <span><i class="fas fa-satellite text-red-400 mr-2"></i> Crime Feed</span>
-                    </h2>
-                    <p class="leading-relaxed">
-                        Real-time news web scraper extracting live incident headlines, resolving geographic coordinates, and updating satellite heatmaps.
-                    </p>
-                </div>
-                <div class="mt-auto">
-                    <a href="{{url_for('crimefeed')}}" style="text-decoration:none; display:block;">
-                        <button type="button" class="button" style="width:100%;">
-                            <span>Live Heatmap</span>
-                            <i class="fas fa-fire text-xs ml-2"></i>
+                    <div class="drop-down mt-auto">
+                        <button type="button" class="button">
+                            <span>Access Dossier</span>
+                            <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
                         </button>
-                    </a>
+                        <div class="dd-content">
+                            <a href="{{url_for('Randomfrstcls')}}"><i class="fas fa-brain mr-2"></i> Multi-Category Predictive Risk Engine</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             {% endif %}
 
-            {# --- Module 8: Case File Intelligence Analyzer — field_officer only --- #}
-            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            {# --- Module 3: Demographic Trend Analytics --- #}
+            {% if current_user.is_authenticated %}
             <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
+                <div class="hud-module-card">
+                    <span class="algorithm-badge algorithm-badge-ols">
+                        <i class="fas fa-chart-line mr-1"></i> Ordinary Least Squares Linear Regression
+                    </span>
                     <h2 class="title-font">
-                        <span><i class="fas fa-brain text-cyan-400 mr-2"></i> Case Analyzer</span>
+                        <span><i class="fas fa-chart-line text-yellow-400 mr-2"></i> Demographic Trend Analytics</span>
                     </h2>
                     <p class="leading-relaxed">
-                        NLP threat severity extraction, VADER sentiment scoring, and automated entity mapping (weapons, timelines, IPC classes) from FIR files.
+                        Geometric growth decadal population projections coupled with trained OLS linear regression models to calculate projected state-level IPC crime volume and rates.
                     </p>
-                </div>
-                <div class="mt-auto">
-                    <a href="{{url_for('analyze_case')}}" style="text-decoration:none; display:block;">
-                        <button type="button" class="button" style="width:100%;">
-                            <span>Analyze Case File</span>
-                            <i class="fas fa-microchip text-xs ml-2"></i>
-                        </button>
-                    </a>
+                    <div class="mt-auto">
+                        <a href="{{url_for('LinearReg')}}" style="text-decoration:none; display:block;">
+                            <button type="button" class="button" style="width:100%;">
+                                <span>Demographic Trend Analytics</span>
+                                <i class="fas fa-arrow-right text-xs ml-2"></i>
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
             {% endif %}
 
-            {# --- Module 9: Evidence Datasets — field_officer only --- #}
+            {# --- Module 4: Longitudinal Crime Projections --- #}
+            {% if current_user.is_authenticated %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div class="hud-module-card">
+                    <span class="algorithm-badge algorithm-badge-prophet">
+                        <i class="fas fa-wave-square mr-1"></i> Facebook Prophet Time-Series Model
+                    </span>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-wave-square text-cyan-300 mr-2"></i> Longitudinal Crime Projections</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Meta Prophet predictive neural horizon modeling seasonality, holidays, and trends to forecast national crime trajectories up to 2027 with 88.85% validation accuracy.
+                    </p>
+                    <div class="drop-down mt-auto">
+                        <button type="button" class="button">
+                            <span>Access Dossier</span>
+                            <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
+                        </button>
+                        <div class="dd-content">
+                            <a href="{{url_for('timeseriescr')}}"><i class="fas fa-chart-area mr-2"></i> Crime Rate Horizon Forecast</a>
+                            <a href="{{url_for('timeseriesipc')}}"><i class="fas fa-chart-bar mr-2"></i> Total IPC Volume Forecast</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# --- Module 5: FIR Threat Assessment HUD --- #}
             {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
             <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div>
+                <div class="hud-module-card">
+                    <span class="algorithm-badge algorithm-badge-nlp">
+                        <i class="fas fa-shield-virus mr-1"></i> VADER NLP + RegEx Weighted IPC Severity Scoring
+                    </span>
                     <h2 class="title-font">
-                        <span><i class="fas fa-folder-open text-blue-400 mr-2"></i> Raw Data</span>
+                        <span><i class="fas fa-microchip text-cyan-400 mr-2"></i> FIR Threat Assessment HUD</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        NLP threat severity extraction, VADER sentiment scoring, and automated entity mapping (weapons, timelines, IPC classes) from FIR documents.
+                    </p>
+                    <div class="mt-auto">
+                        <a href="{{url_for('analyze_case')}}" style="text-decoration:none; display:block;">
+                            <button type="button" class="button" style="width:100%;">
+                                <span>Launch Threat Assessment HUD</span>
+                                <i class="fas fa-microchip text-xs ml-2"></i>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# --- Module 6: Real-Time Spatial Heatmap HUD --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div class="hud-module-card">
+                    <span class="algorithm-badge algorithm-badge-scraper">
+                        <i class="fas fa-satellite mr-1"></i> DOM Tree Scraper + GeoPy Geocoding Engine
+                    </span>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-satellite text-red-400 mr-2"></i> Real-Time Spatial Heatmap HUD</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Real-time news web scraper extracting live incident headlines, resolving geographic coordinates via GeoPy, and projecting live kernel density heatmaps.
+                    </p>
+                    <div class="mt-auto">
+                        <a href="{{url_for('crimefeed')}}" style="text-decoration:none; display:block;">
+                            <button type="button" class="button" style="width:100%;">
+                                <span>Launch Spatial Heatmap HUD</span>
+                                <i class="fas fa-fire text-xs ml-2"></i>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# --- Module 7: CDR Intelligence Module --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div class="hud-module-card">
+                    <span class="algorithm-badge algorithm-badge-kmeans">
+                        <i class="fas fa-phone-volume mr-1"></i> Geodesic Distance + Link Analysis
+                    </span>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-tower-broadcast text-cyan-400 mr-2"></i> CDR Intelligence Module</span>
+                    </h2>
+                    <p class="leading-relaxed">
+                        Call Detail Record intelligence evaluating historical cell-tower trajectories, 0.5km crime-scene proximity leads, and top-5 associate link analysis.
+                    </p>
+                    <div class="mt-auto">
+                        <a href="{{url_for('cdr_page')}}" style="text-decoration:none; display:block;">
+                            <button type="button" class="button" style="width:100%;">
+                                <span>Launch CDR Intelligence</span>
+                                <i class="fas fa-magnifying-glass-location text-xs ml-2"></i>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# --- Module 8: Evidence Datasets --- #}
+            {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
+            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
+                <div class="hud-module-card">
+                    <span class="algorithm-badge algorithm-badge-ols">
+                        <i class="fas fa-database mr-1"></i> Verified Evidence Registry
+                    </span>
+                    <h2 class="title-font">
+                        <span><i class="fas fa-folder-open text-blue-400 mr-2"></i> Evidence Datasets</span>
                     </h2>
                     <p class="leading-relaxed">
                         Explore verified NCRB datasets, preprocessed cluster tables, socio-economic crime correlation matrices, and time-series series.
                     </p>
-                </div>
-                <div class="mt-auto">
-                    <a href="{{url_for('datadisp')}}" style="text-decoration:none; display:block;">
-                        <button type="button" class="button" style="width:100%;">
-                            <span>Examine Records</span>
-                            <i class="fas fa-database text-xs ml-2"></i>
-                        </button>
-                    </a>
+                    <div class="mt-auto">
+                        <a href="{{url_for('datadisp')}}" style="text-decoration:none; display:block;">
+                            <button type="button" class="button" style="width:100%;">
+                                <span>Examine Records</span>
+                                <i class="fas fa-database text-xs ml-2"></i>
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -347,8 +357,8 @@
         <p>CRIME INTELLIGENCE & THREAT SURVEILLANCE SYSTEM &copy; 2026 // RESTRICTED ACCESS</p>
     </footer>
 
-    <!-- Suspense FX Engine -->
+    <!-- Scripts -->
+    <script src="{{url_for('static',filename='javascript/theme.js')}}"></script>
     <script src="{{url_for('static',filename='javascript/suspense.js')}}"></script>
 </body>
-
 </html>
