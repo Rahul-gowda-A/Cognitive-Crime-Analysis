@@ -89,6 +89,63 @@ def init_db():
 # Seed on startup before routes are registered
 init_db()
 
+# --- Modus Operandi Vector Search Engine ---
+_mo_engine = None
+
+
+def get_mo_engine():
+    """Lazy-load the MOVectorEngine singleton."""
+    global _mo_engine
+    if _mo_engine is None:
+        from mo_vector_service import MOVectorEngine
+        _mo_engine = MOVectorEngine()
+    return _mo_engine
+
+
+@app.route('/api/search-mo', methods=['POST'])
+def search_mo():
+    """
+    Search for cases with similar Modus Operandi using dense vector embeddings.
+    Accepts 'query' or 'query_text' and optional 'top_k' in JSON body or form data.
+    """
+    data = request.get_json(silent=True) or {}
+    query_text = (
+        data.get('query')
+        or data.get('query_text')
+        or request.form.get('query')
+        or request.form.get('query_text')
+        or request.args.get('query')
+        or ''
+    ).strip()
+
+    if not query_text:
+        return jsonify({
+            'status': 'error',
+            'message': 'Query string is required (use "query" or "query_text").'
+        }), 400
+
+    try:
+        top_k = int(data.get('top_k') or request.form.get('top_k') or request.args.get('top_k') or 5)
+    except (ValueError, TypeError):
+        top_k = 5
+
+    try:
+        engine = get_mo_engine()
+        results = engine.search_similar_cases(query_text=query_text, top_k=top_k)
+        return jsonify({
+            'status': 'success',
+            'query': query_text,
+            'top_k': top_k,
+            'count': len(results),
+            'results': results
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+
 from routes import *
 
 if __name__ == '__main__':
