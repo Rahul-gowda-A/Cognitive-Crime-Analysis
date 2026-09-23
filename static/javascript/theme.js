@@ -29,8 +29,10 @@
     function applyTheme(theme) {
         const isLight = theme === THEME_LIGHT;
         document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.setAttribute('data-bs-theme', theme);
         if (document.body) {
             document.body.setAttribute('data-theme', theme);
+            document.body.setAttribute('data-bs-theme', theme);
         }
 
         // Update all toggle buttons in DOM
@@ -68,6 +70,7 @@
     // Apply saved theme immediately
     const initialTheme = getSavedTheme();
     document.documentElement.setAttribute('data-theme', initialTheme);
+    document.documentElement.setAttribute('data-bs-theme', initialTheme);
 
     // Bind event listeners when DOM is ready
     if (document.readyState === 'loading') {

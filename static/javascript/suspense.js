@@ -269,7 +269,7 @@ function attachInteractiveSounds() {
     });
 
     // Card hover sound
-    document.querySelectorAll('.card, .drop-down, .dossier-card, .xl\\:w-1\\/4').forEach(card => {
+    document.querySelectorAll('.card, .drop-down, .dossier-card, .hud-module-card, .xl\\:w-1\\/4').forEach(card => {
         card.addEventListener('mouseenter', () => {
             SuspenseFX.playBlip(440, 'sine', 0.05);
         });

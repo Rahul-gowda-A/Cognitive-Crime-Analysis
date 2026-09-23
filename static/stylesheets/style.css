@@ -10,7 +10,9 @@
 :root,
 [data-theme="dark"] {
     /* Navy Operational (Default Dark Theme) */
-    --bg-dark: #0f172a;
+    --bg-dark: #0b0f19;
+    --bs-body-bg: #0b0f19;
+    --bs-body-color: #f8fafc;
     --bg-card: rgba(30, 41, 59, 0.75);
     --bg-card-solid: #1e293b;
     --bg-card-hover: rgba(51, 65, 85, 0.85);
@@ -104,7 +106,7 @@
 html, body {
     margin: 0;
     padding: 0;
-    background-color: var(--bg-dark);
+    background-color: var(--bg-dark) !important;
     color: var(--text-primary);
     font-family: var(--font-body);
     min-height: 100vh;
@@ -113,7 +115,7 @@ html, body {
 }
 
 body {
-    background-color: var(--bg-dark);
+    background-color: var(--bg-dark) !important;
     background-image: 
         radial-gradient(at 10% 15%, rgba(56, 189, 248, 0.08) 0px, transparent 55%),
         radial-gradient(at 90% 10%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
@@ -457,7 +459,7 @@ label.log {
     font-size: 13px;
 }
 
-/* --- HUD MODULE CARDS GRID --- */
+/* --- HUD MODULE CARDS FULL-WIDTH STACK --- */
 .container {
     max-width: 1400px !important;
     margin: 0 auto !important;
@@ -465,34 +467,74 @@ label.log {
     border: none !important;
 }
 
-.hud-module-card,
-div.xl\:w-1\/4 {
+.hud-card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+.hud-module-card {
     background: var(--bg-card) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
     border: 1px solid var(--border-glass) !important;
-    border-radius: 18px !important;
-    padding: 24px 22px !important;
+    border-radius: 16px !important;
+    padding: 20px 28px !important;
     box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.3) !important;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
-    min-height: 260px;
+    gap: 2rem;
+    width: 100%;
     position: relative;
+    overflow: visible;
 }
 
-[data-theme="light"] .hud-module-card,
-[data-theme="light"] div.xl\:w-1\/4 {
+[data-theme="light"] .hud-module-card {
     box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08) !important;
 }
 
-.hud-module-card:hover,
-div.xl\:w-1\/4:hover {
+.hud-module-card:hover {
     background: var(--bg-card-hover) !important;
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     border-color: var(--border-glass-hover) !important;
     box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.4), 0 0 25px var(--accent-primary-glow) !important;
+}
+
+.hud-card-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.hud-card-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.hud-card-actions .button {
+    min-width: 220px;
+    white-space: nowrap;
+}
+
+.hud-card-actions .drop-down {
+    width: auto;
+    position: relative;
+}
+
+.hud-card-actions .drop-down .button {
+    min-width: 220px;
+}
+
+.hud-card-actions .dd-content {
+    min-width: 260px;
+    right: 0;
+    left: auto;
+    bottom: calc(100% + 8px);
 }
 
 h2.title-font,
@@ -501,18 +543,38 @@ h2.title-font,
     font-size: 18px !important;
     font-weight: 700 !important;
     color: var(--text-primary) !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 8px !important;
     display: flex;
     align-items: center;
-    justify-content: space-between;
 }
 
-p.leading-relaxed {
+.hud-card-content p.leading-relaxed {
     font-family: var(--font-body) !important;
     font-size: 13.5px !important;
     line-height: 1.6 !important;
     color: var(--text-secondary) !important;
-    margin-bottom: 18px !important;
+    margin-bottom: 0 !important;
+    max-width: 950px;
+}
+
+@media (max-width: 860px) {
+    .hud-module-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.25rem;
+        padding: 20px !important;
+    }
+
+    .hud-card-actions {
+        justify-content: stretch;
+    }
+
+    .hud-card-actions .button,
+    .hud-card-actions .drop-down,
+    .hud-card-actions .drop-down .button {
+        width: 100%;
+        min-width: unset;
+    }
 }
 
 /* --- BUTTONS --- */

@@ -140,15 +140,15 @@
     {% endif %}
 
     {# =========================================================
-       Standardized Classified Dossier Modules Grid
+       Standardized Classified Dossier Modules Stack
        ========================================================= #}
     <section class="container px-5 py-6 mx-auto">
-        <div class="flex flex-wrap -m-3">
+        <div class="hud-card-container">
 
             {# --- Module 1: Spatial Risk Zoning HUD --- #}
             {% if current_user.is_authenticated %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div class="hud-module-card">
+            <div class="hud-module-card">
+                <div class="hud-card-content">
                     <span class="algorithm-badge algorithm-badge-kmeans">
                         <i class="fas fa-project-diagram mr-1"></i> K-Means Clustering Algorithm
                     </span>
@@ -158,7 +158,9 @@
                     <p class="leading-relaxed">
                         Unsupervised multi-dimensional partitioning of 700+ Indian districts into Red, Orange, and Green Crime Threat Zones based on historical IPC crime metrics.
                     </p>
-                    <div class="drop-down mt-auto">
+                </div>
+                <div class="hud-card-actions">
+                    <div class="drop-down">
                         <button type="button" class="button">
                             <span>Access Dossier</span>
                             <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
@@ -173,8 +175,8 @@
 
             {# --- Module 2: Multi-Category Predictive Risk Engine --- #}
             {% if current_user.is_authenticated %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div class="hud-module-card">
+            <div class="hud-module-card">
+                <div class="hud-card-content">
                     <span class="algorithm-badge algorithm-badge-rf">
                         <i class="fas fa-brain mr-1"></i> Random Forest Classifier
                     </span>
@@ -184,7 +186,9 @@
                     <p class="leading-relaxed">
                         Random Forest bagged ensemble evaluating future crime incidents via Exponential Smoothing to predict multi-category district risk designations.
                     </p>
-                    <div class="drop-down mt-auto">
+                </div>
+                <div class="hud-card-actions">
+                    <div class="drop-down">
                         <button type="button" class="button">
                             <span>Access Dossier</span>
                             <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
@@ -199,8 +203,8 @@
 
             {# --- Module 3: Demographic Trend Analytics --- #}
             {% if current_user.is_authenticated %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div class="hud-module-card">
+            <div class="hud-module-card">
+                <div class="hud-card-content">
                     <span class="algorithm-badge algorithm-badge-ols">
                         <i class="fas fa-chart-line mr-1"></i> Ordinary Least Squares Linear Regression
                     </span>
@@ -210,22 +214,22 @@
                     <p class="leading-relaxed">
                         Geometric growth decadal population projections coupled with trained OLS linear regression models to calculate projected state-level IPC crime volume and rates.
                     </p>
-                    <div class="mt-auto">
-                        <a href="{{url_for('LinearReg')}}" style="text-decoration:none; display:block;">
-                            <button type="button" class="button" style="width:100%;">
-                                <span>Demographic Trend Analytics</span>
-                                <i class="fas fa-arrow-right text-xs ml-2"></i>
-                            </button>
-                        </a>
-                    </div>
+                </div>
+                <div class="hud-card-actions">
+                    <a href="{{url_for('LinearReg')}}" style="text-decoration:none;">
+                        <button type="button" class="button">
+                            <span>Demographic Trend Analytics</span>
+                            <i class="fas fa-arrow-right text-xs ml-2"></i>
+                        </button>
+                    </a>
                 </div>
             </div>
             {% endif %}
 
             {# --- Module 4: Longitudinal Crime Projections --- #}
             {% if current_user.is_authenticated %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div class="hud-module-card">
+            <div class="hud-module-card">
+                <div class="hud-card-content">
                     <span class="algorithm-badge algorithm-badge-prophet">
                         <i class="fas fa-wave-square mr-1"></i> Facebook Prophet Time-Series Model
                     </span>
@@ -235,7 +239,9 @@
                     <p class="leading-relaxed">
                         Meta Prophet predictive neural horizon modeling seasonality, holidays, and trends to forecast national crime trajectories up to 2027 with 88.85% validation accuracy.
                     </p>
-                    <div class="drop-down mt-auto">
+                </div>
+                <div class="hud-card-actions">
+                    <div class="drop-down">
                         <button type="button" class="button">
                             <span>Access Dossier</span>
                             <i class="fas fa-chevron-down text-xs ml-2 dropdown-arrow"></i>
@@ -251,8 +257,8 @@
 
             {# --- Module 5: FIR Threat Assessment HUD --- #}
             {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div class="hud-module-card">
+            <div class="hud-module-card">
+                <div class="hud-card-content">
                     <span class="algorithm-badge algorithm-badge-nlp">
                         <i class="fas fa-shield-virus mr-1"></i> VADER NLP + RegEx Weighted IPC Severity Scoring
                     </span>
@@ -262,22 +268,22 @@
                     <p class="leading-relaxed">
                         NLP threat severity extraction, VADER sentiment scoring, and automated entity mapping (weapons, timelines, IPC classes) from FIR documents.
                     </p>
-                    <div class="mt-auto">
-                        <a href="{{url_for('analyze_case')}}" style="text-decoration:none; display:block;">
-                            <button type="button" class="button" style="width:100%;">
-                                <span>Launch Threat Assessment HUD</span>
-                                <i class="fas fa-microchip text-xs ml-2"></i>
-                            </button>
-                        </a>
-                    </div>
+                </div>
+                <div class="hud-card-actions">
+                    <a href="{{url_for('analyze_case')}}" style="text-decoration:none;">
+                        <button type="button" class="button">
+                            <span>Launch Threat Assessment HUD</span>
+                            <i class="fas fa-microchip text-xs ml-2"></i>
+                        </button>
+                    </a>
                 </div>
             </div>
             {% endif %}
 
             {# --- Module 6: Real-Time Spatial Heatmap HUD --- #}
             {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div class="hud-module-card">
+            <div class="hud-module-card">
+                <div class="hud-card-content">
                     <span class="algorithm-badge algorithm-badge-scraper">
                         <i class="fas fa-satellite mr-1"></i> DOM Tree Scraper + GeoPy Geocoding Engine
                     </span>
@@ -287,22 +293,22 @@
                     <p class="leading-relaxed">
                         Real-time news web scraper extracting live incident headlines, resolving geographic coordinates via GeoPy, and projecting live kernel density heatmaps.
                     </p>
-                    <div class="mt-auto">
-                        <a href="{{url_for('crimefeed')}}" style="text-decoration:none; display:block;">
-                            <button type="button" class="button" style="width:100%;">
-                                <span>Launch Spatial Heatmap HUD</span>
-                                <i class="fas fa-fire text-xs ml-2"></i>
-                            </button>
-                        </a>
-                    </div>
+                </div>
+                <div class="hud-card-actions">
+                    <a href="{{url_for('crimefeed')}}" style="text-decoration:none;">
+                        <button type="button" class="button">
+                            <span>Launch Spatial Heatmap HUD</span>
+                            <i class="fas fa-fire text-xs ml-2"></i>
+                        </button>
+                    </a>
                 </div>
             </div>
             {% endif %}
 
             {# --- Module 7: CDR Intelligence Module --- #}
             {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div class="hud-module-card">
+            <div class="hud-module-card">
+                <div class="hud-card-content">
                     <span class="algorithm-badge algorithm-badge-kmeans">
                         <i class="fas fa-phone-volume mr-1"></i> Geodesic Distance + Link Analysis
                     </span>
@@ -312,22 +318,22 @@
                     <p class="leading-relaxed">
                         Call Detail Record intelligence evaluating historical cell-tower trajectories, 0.5km crime-scene proximity leads, and top-5 associate link analysis.
                     </p>
-                    <div class="mt-auto">
-                        <a href="{{url_for('cdr_page')}}" style="text-decoration:none; display:block;">
-                            <button type="button" class="button" style="width:100%;">
-                                <span>Launch CDR Intelligence</span>
-                                <i class="fas fa-magnifying-glass-location text-xs ml-2"></i>
-                            </button>
-                        </a>
-                    </div>
+                </div>
+                <div class="hud-card-actions">
+                    <a href="{{url_for('cdr_page')}}" style="text-decoration:none;">
+                        <button type="button" class="button">
+                            <span>Launch CDR Intelligence</span>
+                            <i class="fas fa-magnifying-glass-location text-xs ml-2"></i>
+                        </button>
+                    </a>
                 </div>
             </div>
             {% endif %}
 
             {# --- Module 8: Evidence Datasets --- #}
             {% if current_user.is_authenticated and current_user.role == 'field_officer' %}
-            <div class="xl:w-1/4 lg:w-1/2 md:w-full">
-                <div class="hud-module-card">
+            <div class="hud-module-card">
+                <div class="hud-card-content">
                     <span class="algorithm-badge algorithm-badge-ols">
                         <i class="fas fa-database mr-1"></i> Verified Evidence Registry
                     </span>
@@ -337,14 +343,14 @@
                     <p class="leading-relaxed">
                         Explore verified NCRB datasets, preprocessed cluster tables, socio-economic crime correlation matrices, and time-series series.
                     </p>
-                    <div class="mt-auto">
-                        <a href="{{url_for('datadisp')}}" style="text-decoration:none; display:block;">
-                            <button type="button" class="button" style="width:100%;">
-                                <span>Examine Records</span>
-                                <i class="fas fa-database text-xs ml-2"></i>
-                            </button>
-                        </a>
-                    </div>
+                </div>
+                <div class="hud-card-actions">
+                    <a href="{{url_for('datadisp')}}" style="text-decoration:none;">
+                        <button type="button" class="button">
+                            <span>Examine Records</span>
+                            <i class="fas fa-database text-xs ml-2"></i>
+                        </button>
+                    </a>
                 </div>
             </div>
             {% endif %}
